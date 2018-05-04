@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import anavs_parser
 
 from nav_msgs.msg import Odometry
+from anavs_rtk_dlr.msg import odometry as od
 from sensor_msgs.msg import NavSatFix, TimeReference
 
 # TCP_IP = "192.168.20.53" #'localhost'
@@ -29,6 +30,7 @@ class AnavsRTKNode:
         self.text_buffer = ' '
         self.parser = anavs_parser.ANAVSParserUBX()
         self.odometry_msg = Odometry()
+        self.msg_check = od()
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
@@ -37,6 +39,7 @@ class AnavsRTKNode:
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
         self.pub_odometry = rospy.Publisher('rtk_odometry', Odometry, queue_size=10)
+        self.pub_msg_check = rospy.Publisher('message_check', od, queue_size=10)
         self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
         self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
         rospy.init_node('anavs_rtk_node', anonymous=True)
@@ -50,13 +53,13 @@ class AnavsRTKNode:
 
         # ------------------------------------------------------------------------------
         # main loop
-        rate = rospy.Rate(100.)
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             readable, writable, exceptional = select.select([self.tcp_socket], [], [self.tcp_socket], 1)
             if self.tcp_socket in readable:
                 self.text_buffer += self.tcp_socket.recv(4096)
                 if self.parse_data_ubx():
-                    if self.parser.code == 4 or self.parser.code == 5:
+                    if self.parser.code == 4 or self.parser.code == 5 or self.parser.code == 1:
                         current_time = rospy.Time.now()
                         self.build_odometry_msg(current_time, self.parser.code)
                         self.build_nav_msg(current_time)
@@ -91,32 +94,43 @@ class AnavsRTKNode:
         self.odometry_msg.pose.pose.position.y = self.parser.baseline_y
         self.odometry_msg.pose.pose.position.z = self.parser.baseline_z
 
-        self.odometry_msg.pose.covariance[0] = 0.001
-        self.odometry_msg.pose.covariance[7] = 0.001
-        self.odometry_msg.pose.covariance[14] = 99999.0
-        self.odometry_msg.pose.covariance[21] = 99999.0
-        self.odometry_msg.pose.covariance[28] = 99999.0
-        self.odometry_msg.pose.covariance[35] = 2.0 / 180.0 * math.pi
+        translation_vector = np.array([[self.parser.baseline_x, self.parser.baseline_y, self.parser.baseline_z]])
+        self.msg_check.header.stamp=rospy.Time.now()
+        self.msg_check.header.stamp = current_time
+        self.msg_check.header.frame_id = "world"
+        rotation_matrix = self.build_r1(self.parser.bank) * self.build_r2(self.parser.elevation) * self.build_r3(
+            self.parser.heading)
+        self.msg_check.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        print np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
-        deg2rad = math.pi / 180.
-        quaternion = tf.transformations.quaternion_from_euler(self.parser.bank * deg2rad,
-                                                              self.parser.elevation * deg2rad,
-                                                              self.parser.heading * deg2rad)
-        self.odometry_msg.pose.pose.orientation.x = quaternion[0]
-        self.odometry_msg.pose.pose.orientation.y = quaternion[1]
-        self.odometry_msg.pose.pose.orientation.z = quaternion[2]
-        self.odometry_msg.pose.pose.orientation.w = quaternion[3]
+        #self.odometry_msg.pose.covariance[0] = 0.001
+        #self.odometry_msg.pose.covariance[7] = 0.001
+        #self.odometry_msg.pose.covariance[14] = 99999.0
+        #self.odometry_msg.pose.covariance[21] = 99999.0
+        #self.odometry_msg.pose.covariance[28] = 99999.0
+        #self.odometry_msg.pose.covariance[35] = 2.0 / 180.0 * math.pi
+
+        #deg2rad = math.pi / 180.
+        # out_R_nb = R1(phi)*R2(theta)*R3(psi);
+        #quaternion = tf.transformations.quaternion_from_euler(self.parser.bank * deg2rad,
+        #                                                      self.parser.elevation * deg2rad,
+        #                                                      self.parser.heading * deg2rad)
+        #self.odometry_msg.pose.pose.orientation.x = quaternion[0]
+        #self.odometry_msg.pose.pose.orientation.y = quaternion[1]
+        #self.odometry_msg.pose.pose.orientation.z = quaternion[2]
+        #self.odometry_msg.pose.pose.orientation.w = quaternion[3]
 
         # self.odometry_msg.twist.twist.linear.x= 0.0 #self.parser.velocity_x
         # self.odometry_msg.twist.twist.linear.y=0.0 #self.parser.velocity_y
         # self.odometry_msg.twist.twist.linear.z=0.0 #self.parser.velocity_z
 
-        self.odometry_msg.twist.covariance[0] = 0.02
-        self.odometry_msg.twist.covariance[7] = 9999.0
-        self.odometry_msg.twist.covariance[14] = 99999.0
-        self.odometry_msg.twist.covariance[21] = 99999.0
-        self.odometry_msg.twist.covariance[28] = 99999.0
-        self.odometry_msg.twist.covariance[35] = 99999.0
+        #self.odometry_msg.twist.covariance[0] = 0.02
+        #self.odometry_msg.twist.covariance[7] = 9999.0
+        #self.odometry_msg.twist.covariance[14] = 99999.0
+        #self.odometry_msg.twist.covariance[21] = 99999.0
+        #self.odometry_msg.twist.covariance[28] = 99999.0
+        #self.odometry_msg.twist.covariance[35] = 99999.0
+        self.pub_msg_check.publish(self.msg_check)
 
         # self.odometry_msg.twist.twist = self.odom_local.twist.twist;
 
@@ -125,6 +139,21 @@ class AnavsRTKNode:
 
         # self.odom_broadcaster.sendTransform((self.parser.baseline_x,self.parser.baseline_y, self.parser.baseline_z), quaternion, current_time,"base_footprint","odom")
         self.pub_odometry.publish(self.odometry_msg)
+
+    def build_r1(self, alpha):
+        rot_matrix = np.array(
+            [[1, 0, 0], [0, math.cos(alpha), math.sin(alpha)], [0, -math.sin(alpha), math.cos(alpha)]])
+        return rot_matrix
+
+    def build_r2(self, alpha):
+        rot_matrix = np.array(
+            [[math.cos(alpha), 0, -math.sin(alpha)], [0, 1, 0], [math.sin(alpha), 0, math.cos(alpha)]])
+        return rot_matrix
+
+    def build_r3(self, alpha):
+        rot_matrix = np.array(
+            [[math.cos(alpha), math.sin(alpha), 0], [-math.sin(alpha), math.cos(alpha), 0], [0, 0, 1]])
+        return rot_matrix
 
     def build_nav_msg(self, current_time):
         self.nav_msg.header.stamp = current_time
@@ -141,6 +170,7 @@ class AnavsRTKNode:
         self.gnss_time_msg.header.stamp = current_time
         seconds = self.parser.seconds + self.parser.week * 604800
         utc = datetime(1980, 1, 6) + timedelta(seconds=seconds - (LEAPSECONDS - 19))
+        print utc
         if utc.year != 2018:
             rospy.logwarn('AnavsRTKNode: the leapseconds are set for 2018, please adjust in anavs_rtk_node.py!')
         self.gnss_time_msg.time_ref = rospy.Time.from_sec((utc - datetime(1970, 1, 1)).total_seconds())

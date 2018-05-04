@@ -15,21 +15,27 @@ class ANAVSParserUBX:
         if resCode[12] == '1' and resCode[11] == '1':
             self.code = 4
 
-        self.week = float(struct.unpack('H', text[6 + 3:6 + 5])[0]) #1996
+        self.week = float(struct.unpack('H', text[6 + 3:6 + 5])[0])  # 1996
         self.seconds = struct.unpack('d', text[6 + 5:6 + 13])[0]
-        self.baseline_x = struct.unpack('d', text[6 + 49 + 8:6 + 49 + 16])[0] #e
-        self.baseline_y = struct.unpack('d', text[6 + 49 + 0:6 + 49 + 8])[0] #N
-        self.baseline_z = -struct.unpack('d', text[6 + 49 + 16:6 + 49 + 24])[0] #u
+        # self.baseline_x = struct.unpack('d', text[6 + 49 + +24 + 8:6 + 49 + 24 + 16])[0]  # e
+        # self.baseline_y = struct.unpack('d', text[6 + 49 + 24 + 0:6 + 49 + 24 + 8])[0]  # N
+        # self.baseline_z = -struct.unpack('d', text[6 + 49 + 24 + 16:6 + 49 + 24 + 24])[0]  # u
+        self.baseline_x = struct.unpack('d', text[6 + 49 + +24 + 0:6 + 49 + 24 + 8])[0]  # n
+        self.baseline_y = struct.unpack('d', text[6 + 49 + 24 + 8:6 + 49 + 24 + 16])[0]  # e
+        self.baseline_z = struct.unpack('d', text[6 + 49 + 24 + 16:6 + 49 + 24 + 24])[0]  # d
         self.latitude = struct.unpack('d', text[6 + 25:6 + 33])[0]
         self.longitude = struct.unpack('d', text[6 + 33:6 + 41])[0]
         self.height = struct.unpack('d', text[6 + 41:6 + 49])[0]
-        self.heading = 360.0 - (struct.unpack('d', text[6 + 193 + 0:6 + 193 + 8])[0])
-        self.elevation = struct.unpack('d', text[6 + 193 + 8:6 + 193 + 16])[0]
-        self.bank = struct.unpack('d', text[6 + 193 + 16:6 + 193 + 24])[0]
-        self.velocity_x = struct.unpack('d', text[6 + 97 + 8:6 + 97 + 16])[0]
-        self.velocity_y = struct.unpack('d', text[6 + 97 + 0:6 + 97 + 8])[0]
-        self.velocity_z = -struct.unpack('d', text[6 + 97 + 16:6 + 97 + 24])[0]
-        self.num_GPS = struct.unpack('B', text[6 + 257 + 80:6 + 258 + 80])[0]
+        # self.heading = 360.0 - (struct.unpack('d', text[6 + 193 + 24 + 0:6 + 193 + 24 + 8])[0])  # yaw psi
+        # self.elevation = struct.unpack('d', text[6 + 193 + 24 + 8:6 + 193 + 24 + 16])[0]  # pitch theta
+        # self.bank = struct.unpack('d', text[6 + 193 + 24 + 16:6 + 193 + 24 + 24])[0]  # roll phi
+        self.heading = struct.unpack('d', text[6 + 193 + 24 + 0:6 + 193 + 24 + 8])[0]  # yaw psi
+        self.elevation = struct.unpack('d', text[6 + 193 + 24 + 8:6 + 193 + 24 + 16])[0]  # pitch theta
+        self.bank = struct.unpack('d', text[6 + 193 + 24 + 16:6 + 193 + 24 + 24])[0]  # roll phi
+        self.velocity_x = struct.unpack('d', text[6 + 97 + 24 + 8:6 + 97 + 24 + 16])[0]
+        self.velocity_y = struct.unpack('d', text[6 + 97 + 24 + 0:6 + 97 + 24 + 8])[0]
+        self.velocity_z = -struct.unpack('d', text[6 + 97 + 24 + 16:6 + 97 + 24 + 24])[0]
+        self.num_GPS = struct.unpack('B', text[6 + 257 + 24 + 80:6 + 258 + 24 + 80])[0]
         self.num_GLO = float('nan')
 
     def __str__(self):

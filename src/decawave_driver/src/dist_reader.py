@@ -60,7 +60,7 @@ class DecaWaveDriver:
         self.tag_angle = rospy.get_param('~tag_angle', 0)
         self.beacon_distance = rospy.get_param('~beacon_distance', 0)
         self.dwPub = rospy.Publisher('/ranger_finder/data', DecaWaveMsg, queue_size=5)
-        #fh = open("/home/aayushsingla/range.txt", "w")
+        fh = open("/home/aayushsingla/range.csv", "w")
 
         try:
             ser = serial.Serial(
@@ -95,14 +95,14 @@ class DecaWaveDriver:
                             range0 = int(data[2], 16) / 1000.0
                             if range0 != 0:
                                 print range0
-                                #fh.write(str(range0) + '\n')
+                                fh.write(str(range0) + '\n')
                                 dwMsg.dist = range0
                                 self.dwPub.publish(dwMsg)  # publish the topic
                         else:
                             print "range0 bad"
 
             ser.close()
-            #fh.close()
+            fh.close()
             # file.flush()
             # file.close()
 
