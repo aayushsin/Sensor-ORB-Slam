@@ -12,7 +12,7 @@ import struct
 from datetime import datetime, timedelta
 
 import anavs_parser
-
+import rospkg
 from nav_msgs.msg import Odometry
 from anavs_rtk_dlr.msg import odometry as od
 from sensor_msgs.msg import NavSatFix, TimeReference
@@ -43,6 +43,8 @@ class AnavsRTKNode:
         self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
         self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
         rospy.init_node('anavs_rtk_node', anonymous=True)
+        self.filepath = str(rospkg.RosPack().get_path('anavs_rtk_dlr')) + '/ground_truth'
+        self.file_s = open(self.filepath, "w")
 
         # ------------------------------------------------------------------------------
         # create connection
@@ -59,6 +61,7 @@ class AnavsRTKNode:
             if self.tcp_socket in readable:
                 self.text_buffer += self.tcp_socket.recv(4096)
                 if self.parse_data_ubx():
+                    #print rospkg.RosPack().get_path('anavs_rtk_dlr')
                     if self.parser.code == 4 or self.parser.code == 5 or self.parser.code == 1:
                         current_time = rospy.Time.now()
                         self.build_odometry_msg(current_time, self.parser.code)
@@ -66,6 +69,7 @@ class AnavsRTKNode:
                         self.build_time(current_time)
 
             rate.sleep()
+        self.file_s.close()
 
     def parse_data_ubx(self):
         header = chr(int('0xb5', 16)) + chr(int('0x62', 16)) + chr(int('0x02', 16)) + chr(int('0xe0', 16))
@@ -101,6 +105,7 @@ class AnavsRTKNode:
         rotation_matrix = self.build_r1(self.parser.bank) * self.build_r2(self.parser.elevation) * self.build_r3(
             self.parser.heading)
         self.msg_check.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        self.file_s.write(str(current_time) + str(np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])) + '\n')
         print np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
         #self.odometry_msg.pose.covariance[0] = 0.001
