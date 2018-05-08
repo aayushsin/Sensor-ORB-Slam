@@ -3,6 +3,7 @@
 #include<fstream>
 #include<chrono>
 #include<string>
+#include <vector>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
@@ -14,7 +15,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <sensor_msgs/Image.h>
 #include <snowmower_msgs/DecaWaveMsg.h>
-
+#include <anavs_rtk_dlr/odometry.h>
 #include <ros/callback_queue.h>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -27,10 +28,12 @@ string Image_path2 = "/home/aayushsingla/catkin_ws/src/right_image_data/";
 string cali_filename = "/home/aayushsingla/catkin_ws/src/filter_synchronizer/src/bumblebee2.yaml";
 string range_file = "/home/aayushsingla/catkin_ws/src/distance_data/range.txt";
 string timestamp_file = "/home/aayushsingla/catkin_ws/src/time_stamp/time_stamp.txt";
+string groundtruth_file = "/home/aayushsingla/catkin_ws/src/ground_truth/ground_truth.txt";
 
 ros::CallbackQueue my_callback_queue;
 ofstream rangelog;
 ofstream timestamplog;
+ofstream groundtruthlog;
 
 std_msgs::Header last_img_header;
 
@@ -44,6 +47,7 @@ double Right_last_timestamp = 0.0;
 double range_last_timestamp = 0.0;
 double Left_mean_timestamp = 0.0;
 double Right_mean_timestamp = 0.0;
+double rtk_timestamp = 0.0;
 
 bool hit_flag = false;       //a match hit when dataset from three topics available
 int recording_image_rate = 2;  //recording rate for dataset
@@ -56,8 +60,10 @@ public:
 
   void Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight);
   void Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message);
+  void GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message);
     cv::Mat M1l,M2l,M1r,M2r;
     float stored_range = 0.0;
+    std::vector<double> matrix;
 };
 
 void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight){
@@ -113,6 +119,9 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
    cv::imwrite(savingName1, imLeft);
   
    rangelog << std::to_string(-1)<<endl;
+	for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+       groundtruthlog << *i << ' ';
+    groundtruthlog <<' '<<endl;
    boost::posix_time::ptime my_posix_time = msgLeft->header.stamp.toBoost();
    std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
    //timestamplog << iso_time_str <<endl;
@@ -133,6 +142,11 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
 	rangelog << stored_range <<endl;
+	for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+       groundtruthlog << *i << ' ';
+    groundtruthlog <<' '<<endl;
+    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+       groundtruthlog << *i << ' '<<endl;
 	if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040)
 	 {
          image_counter1++;
@@ -153,6 +167,9 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
         rangelog << stored_range <<endl;
+	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+            groundtruthlog << *i << ' ';
+        groundtruthlog <<' '<<endl;
 	if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040)
 	 {
          image_counter1++;
@@ -180,13 +197,24 @@ void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& mes
   range_last_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
 }
 
-
+void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message){
+  hit_flag = true;
+  matrix = message ->matrix;
+  //for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+   // std::cout << *i << ' ';
+  //stored_range = message->dist;
+  for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+       groundtruthlog << *i << ' ';
+  groundtruthlog <<' '<<endl;
+  rtk_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
+}
 
 
 int main(int argc, char** argv)
 {
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
+  groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);
   
   ros::init(argc, argv, "stereo");
   ros::start();
@@ -239,10 +267,12 @@ int main(int argc, char** argv)
   sync1.registerCallback(boost::bind(&MatchGrabber::Callback, &igb, _1, _2));
 
   ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
+  ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_groundtruth", 1,&MatchGrabber::GroundTruth_Callback,&igb);
 
   ros::spin();
   rangelog.close();
   timestamplog.close();
+  groundtruthlog.close();
   hit_flag = false;
 
   return 0;

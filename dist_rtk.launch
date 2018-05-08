@@ -12,8 +12,10 @@
   <param name="tag_angle" type="double" value="$(arg t)"/>
   <param name="beacon_distance" type="double" value="$(arg d)"/>
 </node>
+<!--
 
     <node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen">
     </node>
+-->
 
 </launch>

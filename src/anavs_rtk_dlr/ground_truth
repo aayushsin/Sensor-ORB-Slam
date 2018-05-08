@@ -1,33 +1,641 @@
-1525450487340364933[-6483.39030045 -7010.27309718 -5182.93135694            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450487536850929[-6491.45809758 -7019.01596743 -5189.4205731             nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450487727034091[-6499.53092706 -7027.76424093 -5195.91386856            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450487936597108[-6507.60878893 -7036.51791759 -5202.41124341            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450488150522947[-6515.69168319 -7045.27699734 -5208.91269773            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450488339658021[-6523.77960986 -7054.0414801  -5215.41823161            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450488537827014[-6531.87256897 -7062.81136579 -5221.92784511            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450488735934019[-6539.97056053 -7071.58665434 -5228.44153834            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450488935167074[-6548.07358457 -7080.36734565 -5234.95931137            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450489130409955[-6556.18164109 -7089.15343966 -5241.48116428            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
-1525450489334430932[-6564.29473012 -7097.94493628 -5248.00709716            nan            nan
-            nan            nan            nan            nan            nan
-            nan            nan]
+1525794238638933897[ 28.87554482  20.98444152   3.76641458          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794238838963985[ 26.76920119  21.41805304   2.22673564          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794239048042058[ 28.45010125  22.22158291   3.64864855          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794239234833955[ 29.36571352  21.557535     5.10017062          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794239443483114[ 31.90778394  23.02744195   7.35974057          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794239642735958[ 27.89727661  21.79003844   4.91802206          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794239841480016[ 33.54732555  24.1173021    7.50547394          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794240043703079[ 26.01486812  23.50346864   9.33994061          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794240255822896[ 35.43283062  25.57054487  10.24851024          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794240449775934[ 35.48941401  27.16990506   9.6682337           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794240629334926[ 29.96057449  27.12165307  10.29601338          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794240842510938[ 28.8120359   26.57527217   9.89797833          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794241043945074[ 32.43039554  27.06680147  11.25397388          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794241245240926[ 30.08484337  27.52430585   9.70792924          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794241447187900[ 27.97810705  27.55933575   8.67326349          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794241636652946[ 28.93457381  26.32685371   9.98274167          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794241836674928[ 24.54852742  25.38638174   6.88636961          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794242029345035[  9.63872566  23.04703243   6.63492836          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794242329020023[  9.18078327  15.41251564  11.97446884          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794242439399957[ 13.36586207  15.93381654  12.52202647          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794242641805887[ 12.80813755  14.906468    12.9495439           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794242835361957[ 14.12766477  14.98162384  14.72115465          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794243036155939[  7.24430705  14.58441098  12.21508092          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794243329267024[  4.35387009  14.1496557    9.89761371          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794243429012060[  5.44212277  16.54133752  10.57426208          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794243640480041[ 11.66517438  18.53307393  15.32498179          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794243839528083[ 10.9525912   18.94797757  15.25077837          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794244039674043[ 18.36749927  25.56238885  15.02126306          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794244329018115[  4.35037815  20.1116287   10.75184375          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794244439793109[  3.90419341  17.82274904  13.27170767          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794244733170986[ 18.07161071  24.10085999  18.99481363          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794244830239057[ 19.11979352  23.99355424  19.28489495          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794245036254882[ 18.7896953   23.0547648   21.15911077          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794245235831022[ 16.94089919  23.02806917  18.22053997          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794245438256978[ 15.81081426  21.6985262   15.29647047          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794245639612913[ 13.99414207  21.16167718  11.63658597          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794245847095966[ 16.55571326  26.06663777  18.0430812           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794246039330005[ 17.86495344  26.48652226  21.01532916          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794246244376897[ 17.17942644  26.26761821  20.18164055          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794246438774108[ 17.71769404  27.31682447  20.61811641          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794246639820098[ 18.24813236  27.28152119  20.45742732          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794246840013980[ 17.45050822  27.32849532  18.60032502          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794247043520927[ 10.38824435  25.46624331  23.04294371          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794247244637012[  9.66177228  23.63435799  21.96038829          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794247440946102[ 19.0212464   27.46943201  20.99085099          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794247633202075[ 17.97767781  26.79847162  21.25124051          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794247838001012[ 17.9468093   25.9736558   21.01495087          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794248053973913[ 17.52053212  23.60245249  17.94754153          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794248329256057[ 18.81370326  23.50689321  18.1808971           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794248438148975[ 18.59374998  23.45945826  18.15550972          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794248641130924[ 19.68018236  24.27268177  19.88189202          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794248838191986[ 21.31761444  22.73128266  21.82403371          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794249041388988[ 21.00040266  21.53823815  21.36693006          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794249329488039[ 17.93446698  22.29896096  18.16661043          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794249441438913[ 18.24224689  22.43525034  16.96608678          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794249640147924[ 11.58649236  27.64567218  10.10424701          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794249839973926[ 13.98538595  27.61352232  14.15399367          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794250043071031[ 14.42282235  28.04160381  13.06792371          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794250234034061[ 16.57698911  25.5249262   32.00934006          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794250446820974[ 24.90133216  26.61236526  28.08262974          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794250635005950[ 15.77385978  26.40902298  31.71704661          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794250836102962[ 23.29872833  27.0496458   25.41076851          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794251036341905[ 23.64280537  27.72429677  25.46780121          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794251329456090[ 24.37406346  27.72117739  27.34803538          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794251433752059[ 25.79159656  28.3658257   30.1261185           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794251630122900[ 25.61210897  28.13795194  29.85958199          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794251840043067[ 22.84340314  28.48071047  27.93745768          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794252037434101[ 20.90821538  24.88337713  22.90331159          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794252329368114[ 21.51425735  22.68525809  22.15355472          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794252439156055[ 19.18468382  23.79710004  18.45478316          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794252640088081[ 15.35000284  23.43074882  13.64386757          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794252839874982[ 18.57289251  24.16333145  19.0650509           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794253029247045[ 21.838458    24.30094557  22.85648941          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794253329231977[ 19.03832266  25.47019143  18.96966766          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794253529383897[ 19.30573495  26.14517284  19.96763045          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794253640655994[ 21.97804064  27.38348951  24.35923593          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794253841234922[ 19.3559071   26.74391025  21.34561082          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794254055355072[ 18.67835998  24.66085595  20.23802056          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794254329329013[ 19.72465248  24.92046846  21.54064521          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794254429821014[ 20.30631584  26.93745366  22.09598252          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794254633034944[ 20.28962315  26.98583775  22.99481334          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794254841790914[ 22.44111716  25.70094659  24.66140829          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794255036789894[ 20.79475679  23.96784474  20.30603539          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794255232377052[ 22.47153587  26.62331647  23.60177513          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794255432964086[ 22.25753988  25.37676431  21.40135496          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794255634242057[ 22.54845649  24.44735579  20.28155542          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794255829277992[ 21.90375966  24.23895906  19.64306257          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794256038291931[ 22.31067797  24.85083052  19.46352219          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794256236296892[ 21.96366931  25.16577541  19.34953924          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794256440195083[ 22.57200039  24.77591491  19.45885032          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794256636024951[ 21.32584674  23.41198326  17.99215236          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794256839374065[ 21.51893935  22.8443173   18.22991668          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794257038808107[ 15.31013487  21.77356571  22.68727022          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794257233932018[ 23.38939548  24.4956107   20.75725243          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794257429457902[ 21.07370349  22.74362641  34.11988521          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794257629275083[ 26.33230512  24.17607423  25.63180197          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794257829463005[ 14.72077157  18.04333568  20.1094433           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794258043251037[ 15.4213623   17.80095668  20.03417763          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794258331077098[ 11.60279443  20.57777773  13.67842311          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794258429861068[ 10.80192677  20.08835585  11.22827647          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794258630886077[ 12.42076834  19.40064338  13.53002264          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794258829629898[  1.37999579  24.6605533   -2.68662677          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794259029444932[  1.41828642  24.75866637  -2.42669306          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794259229249954[  2.5069473   22.35872508  -2.23972415          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794259429388046[  4.65439514  22.59518158   0.27108977          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794259629265069[ 14.50979163  17.81390543  14.54723037          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794259829375028[ 13.98990128  17.9423518   14.32781342          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794260029354095[ 15.50841003  18.09623961  16.79082939          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794260230083942[ 15.47821348  17.11910639  16.15607632          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794260430393934[ 13.62205334  20.01109395  12.3375498           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794260629482030[ 13.76091294  21.1159182   13.82419294          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794260829613924[ 13.83591351  18.39721777  13.12687562          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794261029411077[ 15.08776391  18.10570775  15.13914862          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794261229346990[ 15.44317256  18.65830654  15.64876158          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794261430447101[ 14.35829661  18.84271495  14.08156308          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794261629592895[ 13.21327797  19.16464211  12.7588038           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794261829296112[ 12.72775175  19.71151171  13.36675392          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794262031418085[ 12.57485523  19.88184392  14.20630586          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794262329351902[  7.87970542  20.38779898  18.64548904          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794262429332017[ 11.64207623  20.68185236  14.21996999          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794262629517078[ 12.71416249  20.69651958  15.5017025           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794262829205036[ 12.24761575  20.59500683  14.15331884          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794263029342889[  8.42026322  19.2530561   21.57790649          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794263229273080[  8.49385414  20.33599636  18.98280299          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794263429347038[ -3.6735656   14.12096443   9.43512514          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794263633363962[ 13.03036911  21.40529977  13.91397138          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794263829364061[ 10.49542936  21.03659287  20.01898653          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794264029643058[ 15.24529507  20.48274551  16.47447465          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794264329452991[ 14.86682225  20.55548038  14.55184552          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794264434027910[ 14.43030067  20.3288141   15.16340233          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794264637173891[ 15.25827128  15.94262527  14.10272945          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794264837018013[ 15.17491025  15.53458249  13.96314534          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794265032635927[ 13.74663808  15.94214376  13.25672993          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794265234108924[ 13.4204711   16.76313211  13.3972752           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794265429728031[ 12.93904658  16.14503749  12.73839062          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794265636365890[ 12.21175184  16.23195021  13.71295015          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794265831089019[ 12.56178658  16.07229194  13.42985219          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794266030983924[ 13.09501341  15.75382056  12.99610549          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794266230540037[ 13.87533615  15.61899156  14.89468106          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794266431852102[ 15.37860371  14.42349236  14.42583806          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794266632298946[ 15.15341416  15.04511994  14.46792396          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794266830014944[ 15.83491417  15.31970316  15.4267658           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794267032908916[ 3.01417822  9.24745606  7.47136111         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794267330004930[ 14.9727566   15.26006099  14.69318817          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794267431902885[ 15.27900833  15.11340974  15.08282623          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794267631694078[ 15.99809911  15.28173651  16.04287321          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794267831142902[ 15.70592993  15.72417705  17.0845048           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794268048470973[ 14.37901409  15.69521104  16.30273447          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794268229243040[ 14.80492122  15.24171374  16.67729539          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794268435450077[ 15.75456826  15.94343631  16.52200126          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794268630352020[ 16.16576238  16.21060564  17.22180633          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794268849417924[ 16.49072907  16.30582073  16.66788641          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794269034656047[ 17.11184172  15.90555499  16.8037721           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794269232079029[ 17.36221195  15.44223396  16.23867308          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794269437378883[ 17.46971096  15.63837066  16.54778979          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794269629422903[ 17.43575758  15.86880887  15.60799198          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794269831793069[ 17.45437239  15.96653765  15.78026522          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794270034025907[ 17.21485161  16.46612506  16.76787093          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794270251732110[ 17.87774331  16.42934416  17.2504208           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794270434779882[ 17.55469639  16.44332983  16.74471341          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794270633280992[ 17.63213257  17.26183865  16.97183354          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794270841753005[ 17.99784935  17.94104298  17.2672954           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794271029310941[ 17.48635947  18.29476298  17.22263272          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794271229788064[ 30.2404163   23.79595866  24.71511649          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794271436407089[ 33.25071297  22.76300819  27.63409318          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794271634993076[ 19.2085638   18.13858888  16.92008453          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794271833868026[ 19.39947345  18.7204692   16.18787085          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794272037465095[ 19.97545439  17.92548376  16.8678954           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794272236573934[ 20.49191232  17.39096028  17.26369702          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794272429809093[ 21.12147421  16.93995268  17.81184139          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794272631432056[ 21.7217468   17.02066311  17.43249954          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794272831722974[ 21.81370583  17.86579024  17.185035            nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794273035634040[ 20.9350958   18.37733632  17.51886484          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794273329560041[ 21.2805597   18.79793262  16.53843343          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794273441601037[ 19.23337026  17.16925641  13.32147435          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794273633140087[ 19.31781598  17.39641359  12.14726386          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794273829716920[ 19.67535363  17.14853577  13.13199874          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794274086899995[ 23.08597531  17.55777551  15.81551301          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794274253515958[ 22.99647535  17.35147176  16.26059823          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794274527394056[ 23.25856738  18.73109494  16.50688198          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794274637360095[ 23.87832115  18.35024425  17.05568505          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794274832187891[ 23.24971161  18.94479247  16.73006306          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794275033423900[ 23.78252198  16.85164699  14.69145824          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794275235183954[ 23.71214229  16.81148602  15.08693903          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794275443680047[ 23.16293666  16.76864915  14.40186664          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794275636740922[ 22.64126848  17.35200525  14.52676789          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794275836041927[ 22.82733383  17.57109815  14.62659101          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794276036138057[ 23.08319337  17.23222653  14.14430487          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794276253551006[ 23.03654543  17.0025689   13.6273586           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794276438378095[ 23.00217454  16.77500382  12.90091526          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794276642604112[ 23.21058101  16.45473423  11.72821624          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794276835953950[ 25.66787138  16.10047591   7.86072035          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794277034439086[ 25.60045004  15.53631097   8.14010869          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794277329317092[ 26.80411242  15.03902718   5.71356337          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794277529313087[ 26.90683924  15.20974187   6.20702794          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794277631823062[ 27.20501203  14.58441149   6.21050992          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794277829852104[ 27.20334661  14.48556339   6.64988296          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794278046521902[ 27.65658475  14.43474748   7.42267688          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794278231837034[ 28.25426597  14.03211849   7.76853888          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794278432529926[ 28.20209354  14.48615717   7.82683905          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794278638720989[ 28.72416998  14.66291256   8.57677097          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794278838077068[ 28.58261524  14.80474288   8.42430975          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794279036411046[ 29.43407126  14.38868521   8.27052566          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794279229526996[ 20.15597401  17.75841396  -2.03664933          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794279434235095[ 10.4699878    4.25680967   6.41704322          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794279637346982[ 8.5918427   9.29103839 -0.3056108          nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794279843116044[ 8.31152888  9.48692597  0.03264748         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794280034540891[ 8.31805372  9.42726784 -2.12325498         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794280232911109[ 7.74607334  8.26428499  1.50848555         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794280435044050[ 8.05813756  8.92100009 -1.13985882         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794280629009008[ 8.71454325  8.18359976 -0.80590531         nan         nan         nan
+         nan         nan         nan         nan         nan         nan]
+1525794280836370944[ 12.58971941   2.72658984   4.98396413          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794281030942916[ 13.1100304    3.168314     5.80394571          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794281328996896[ 11.45384807   2.03449111   7.6862626           nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794281429131984[ 39.88804958  14.95874141  15.92481239          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]
+1525794281629452943[ 40.95817083  15.62439347  16.54099902          nan          nan
+          nan          nan          nan          nan          nan
+          nan          nan]

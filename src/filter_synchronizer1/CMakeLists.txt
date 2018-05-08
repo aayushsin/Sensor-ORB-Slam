@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
         OpenCV
         snowmower_msgs
         std_msgs
+        anavs_rtk_dlr
         message_generation
 	tf)
 #find_package(OpenCV REQUIRED)
@@ -25,7 +26,7 @@ find_package(Boost REQUIRED COMPONENTS thread)
  add_message_files(
    FILES
    DecaWaveMsg.msg
-
+   odometry.msg
  )
 
 catkin_package(

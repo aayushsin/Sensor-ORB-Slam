@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 import anavs_parser
 import rospkg
 from nav_msgs.msg import Odometry
-from anavs_rtk_dlr.msg import odometry as od
+from anavs_rtk_dlr.msg import odometry as odom
 from sensor_msgs.msg import NavSatFix, TimeReference
 
 # TCP_IP = "192.168.20.53" #'localhost'
@@ -30,7 +30,7 @@ class AnavsRTKNode:
         self.text_buffer = ' '
         self.parser = anavs_parser.ANAVSParserUBX()
         self.odometry_msg = Odometry()
-        self.msg_check = od()
+        self.rtk_groundtruth = odom()
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
@@ -39,7 +39,7 @@ class AnavsRTKNode:
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
         self.pub_odometry = rospy.Publisher('rtk_odometry', Odometry, queue_size=10)
-        self.pub_msg_check = rospy.Publisher('message_check', od, queue_size=10)
+        self.pub_rtk_groundtruth = rospy.Publisher('rtk_groundtruth', odom, queue_size=10)
         self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
         self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
         rospy.init_node('anavs_rtk_node', anonymous=True)
@@ -99,12 +99,12 @@ class AnavsRTKNode:
         self.odometry_msg.pose.pose.position.z = self.parser.baseline_z
 
         translation_vector = np.array([[self.parser.baseline_x, self.parser.baseline_y, self.parser.baseline_z]])
-        self.msg_check.header.stamp=rospy.Time.now()
-        self.msg_check.header.stamp = current_time
-        self.msg_check.header.frame_id = "world"
+        #self.rtk_groundtruth.header.stamp=rospy.Time.now()
+        self.rtk_groundtruth.header.stamp = current_time
+        self.rtk_groundtruth.header.frame_id = "world"
         rotation_matrix = self.build_r1(self.parser.bank) * self.build_r2(self.parser.elevation) * self.build_r3(
             self.parser.heading)
-        self.msg_check.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        self.rtk_groundtruth.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
         self.file_s.write(str(current_time) + str(np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])) + '\n')
         print np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
@@ -135,7 +135,7 @@ class AnavsRTKNode:
         #self.odometry_msg.twist.covariance[21] = 99999.0
         #self.odometry_msg.twist.covariance[28] = 99999.0
         #self.odometry_msg.twist.covariance[35] = 99999.0
-        self.pub_msg_check.publish(self.msg_check)
+        self.pub_rtk_groundtruth.publish(self.rtk_groundtruth)
 
         # self.odometry_msg.twist.twist = self.odom_local.twist.twist;
 
