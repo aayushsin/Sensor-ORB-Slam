@@ -58,7 +58,7 @@ class DecaWaveDriver:
         self.tag_angle = rospy.get_param('~tag_angle', 0)
         self.beacon_distance = rospy.get_param('~beacon_distance', 0)
         self.dwPub = rospy.Publisher('/ranger_finder/data', DecaWaveMsg, queue_size=5)
-        filepath = str(rospkg.RosPack().get_path('decawave_driver')) + '/src/range_640.csv'
+        filepath = str(rospkg.RosPack().get_path('decawave_driver')) + '/src/range_pinakothen_30.csv'
         fh = open(filepath, "w")
         #fh = open("/home/aayushsingla/range.csv", "w")
         self.last_time = rospy.rostime.Time(0,0)
