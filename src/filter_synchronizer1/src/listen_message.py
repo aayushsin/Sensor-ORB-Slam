@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 import rospy
-from anavs_rtk_dlr.msg import odometry as odom
+from filter_synchronizer1.msg import slamMsg
 
 
 
 def callback(msg):
-    # print str(msg.matrix)
     time = msg.header.stamp
     print(time)
+    print msg.range
 
 
 def listen_message():
     rospy.init_node('listen_message', anonymous=True)
-    mysub = rospy.Subscriber('rtk_groundtruth', odom, callback)
+    mysub = rospy.Subscriber('stereoslam_bag', slamMsg, callback)
     rospy.spin()
 
 

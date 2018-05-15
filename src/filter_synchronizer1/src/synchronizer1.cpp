@@ -11,11 +11,13 @@
 #include <ros/ros.h>
 #include <cv_bridge/cv_bridge.h>
 #include <message_filters/subscriber.h>
+#include <ros/publisher.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <sensor_msgs/Image.h>
 #include <snowmower_msgs/DecaWaveMsg.h>
 #include <anavs_rtk_dlr/odometry.h>
+#include <filter_synchronizer1/slamMsg.h>
 #include <ros/callback_queue.h>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -36,6 +38,7 @@ ofstream timestamplog;
 ofstream groundtruthlog;
 
 std_msgs::Header last_img_header;
+//ros::Publisher slam_pub;
 
 int Left_img_sec = 0;
 int Left_img_nsec = 0;
@@ -57,7 +60,9 @@ int counter = 0;
 
 class MatchGrabber{
 public:
-  MatchGrabber(){}
+  MatchGrabber(){
+    //ros::Publisher slam_pub = nh.advertise<filter_synchronizer1::slamMsg>("stereoslam_bag", 1000);
+  }
 
   void Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight);
   void Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message);
@@ -69,6 +74,8 @@ public:
 
 void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight){
   // Copy the ros image message to cv::Mat.
+  filter_synchronizer1::slamMsg output;
+  output.range = 10;
   cv_bridge::CvImageConstPtr cv_ptrLeft;
   try
   {
@@ -194,6 +201,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   last_img_header = msgLeft->header;
   Left_last_timestamp = Left_img_sec + Left_img_nsec/1e9;
   Right_last_timestamp = Right_img_sec + Right_img_nsec/1e9;
+  //slam_pub.publish(output);
 }
 
 void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message){
@@ -259,6 +267,7 @@ int main(int argc, char** argv)
 
   ros::NodeHandle nh;
 
+  //ros::Publisher slam_pub = nh.advertise<filter_synchronizer1::slamMsg>("stereoslam_bag", 1000);
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol1;
@@ -268,6 +277,7 @@ int main(int argc, char** argv)
   ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
   ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_groundtruth", 1,&MatchGrabber::GroundTruth_Callback,&igb);
 
+  ros::Rate loop_rate(100);
   ros::spin();
   rangelog.close();
   timestamplog.close();

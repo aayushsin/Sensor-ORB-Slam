@@ -2,10 +2,8 @@
 import Tkinter, tkFileDialog
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import norm
 from scipy.stats.kde import gaussian_kde
 from numpy import linspace
-from scipy.interpolate import UnivariateSpline
 
 if __name__ == "__main__":
     root = Tkinter.Tk()
@@ -37,8 +35,9 @@ if __name__ == "__main__":
         textstr = '$\mu=%.2f$\n$\mathrm{Variation}=%.2f$\n$\sigma=%.2f$' % (np.mean(data), max(data)-min(data), np.std(data))
         # place a text box in upper left in axes coords
         ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+        plt.xlim(109.5,110.5)
         plt.plot(dist_space, kde(dist_space))
-        plt.savefig('Range_Pinakothen_max_min.png')
+        plt.savefig('Range_Pinakothen_110.png')
         plt.show()
         print 'Mean : ' + str(np.mean(data))
         print 'Standard Deviation :' + str(np.std(data))

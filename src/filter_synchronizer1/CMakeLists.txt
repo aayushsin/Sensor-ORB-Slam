@@ -7,17 +7,18 @@ find_package(catkin REQUIRED COMPONENTS
 	image_transport 
 	roscpp
 	rospy
-        cv_bridge
-        OpenCV
-        snowmower_msgs
-        std_msgs
-        anavs_rtk_dlr
-        message_generation
+    cv_bridge
+    OpenCV
+    snowmower_msgs
+    std_msgs
+    sensor_msgs
+    anavs_rtk_dlr
+    message_generation
 	tf)
 #find_package(OpenCV REQUIRED)
-catkin_package(
-  CATKIN_DEPENDS message_runtime 
-)
+#catkin_package(
+#  CATKIN_DEPENDS message_runtime
+#)
 include_directories(${OpenCV_INCLUDE_DIRS})
 # This driver uses Boost threads
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -27,10 +28,19 @@ find_package(Boost REQUIRED COMPONENTS thread)
    FILES
    DecaWaveMsg.msg
    odometry.msg
+   slamMsg.msg
  )
+
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+   sensor_msgs
+ )
+
 
 catkin_package(
   LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -39,5 +49,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 add_executable(synchronizer_node1 src/synchronizer1.cpp)
+#add_executable(synchronizer_node2 src/sync2.cpp)
 target_link_libraries(synchronizer_node1 ${catkin_LIBRARIES})
+#target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node1 ${OpenCV_LIBS})
