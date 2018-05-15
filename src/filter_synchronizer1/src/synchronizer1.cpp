@@ -47,6 +47,7 @@ double Right_last_timestamp = 0.0;
 double range_last_timestamp = 0.0;
 double Left_mean_timestamp = 0.0;
 double Right_mean_timestamp = 0.0;
+double test_time = 0.0;
 double rtk_timestamp = 0.0;
 
 bool hit_flag = false;       //a match hit when dataset from three topics available
@@ -119,9 +120,11 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
    cv::imwrite(savingName1, imLeft);
   
    rangelog << std::to_string(-1)<<endl;
-	for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-       groundtruthlog << *i << ' ';
-    groundtruthlog <<' '<<endl;
+   test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
+   groundtruthlog << std::to_string(test_time)<<" - ";
+    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+       groundtruthlog << *i << " ";
+    groundtruthlog <<""<<endl;
    boost::posix_time::ptime my_posix_time = msgLeft->header.stamp.toBoost();
    std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
    //timestamplog << iso_time_str <<endl;
@@ -142,12 +145,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
 	rangelog << stored_range <<endl;
+	test_time = last_img_header.stamp.sec + last_img_header.stamp.nsec/1e9 - rtk_timestamp;
+   groundtruthlog << std::to_string(test_time)<<" - ";
 	for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-       groundtruthlog << *i << ' ';
-    groundtruthlog <<' '<<endl;
-    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-       groundtruthlog << *i << ' '<<endl;
-	if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040)
+       groundtruthlog << *i << " ";
+    groundtruthlog <<""<<endl;
+    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040)
 	 {
          image_counter1++;
          std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
@@ -167,9 +170,11 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
         rangelog << stored_range <<endl;
+        test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
+        groundtruthlog << std::to_string(test_time)<<" - ";
 	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-            groundtruthlog << *i << ' ';
-        groundtruthlog <<' '<<endl;
+            groundtruthlog << *i << " ";
+        groundtruthlog <<""<<endl;
 	if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040)
 	 {
          image_counter1++;
@@ -200,12 +205,6 @@ void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& mes
 void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message){
   hit_flag = true;
   matrix = message ->matrix;
-  //for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-   // std::cout << *i << ' ';
-  //stored_range = message->dist;
-  for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
-       groundtruthlog << *i << ' ';
-  groundtruthlog <<' '<<endl;
   rtk_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
 }
 
