@@ -12,7 +12,7 @@ def callback(msg):
 
 def listen_message():
     rospy.init_node('listen_message', anonymous=True)
-    mysub = rospy.Subscriber('stereoslam_bag', slamMsg, callback)
+    mysub = rospy.Subscriber('/rover_status', slamMsg, callback)
     rospy.spin()
 
 

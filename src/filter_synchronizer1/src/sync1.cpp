@@ -17,6 +17,7 @@
 #include <ros/callback_queue.h>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <filter_synchronizer1/slamMsg.h>
 
 using namespace std;
 using namespace message_filters;
@@ -52,16 +53,16 @@ int counter = 0;
 
 class MatchGrabber{
 public:
-  MatchGrabber(){
-
-  }
+  MatchGrabber(){}
 
   void Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight);
   void Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message);
   void GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message);
-    cv::Mat M1l,M2l,M1r,M2r;
-    float stored_range = 0.0;
-    std::vector<double> matrix;
+  cv::Mat M1l,M2l,M1r,M2r;
+  float stored_range = 0.0;
+  std::vector<double> rtk_matrix;
+  ros::Publisher rover_status_pub;
+  filter_synchronizer1::slamMsg rover_status;
 };
 
 void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight){
@@ -95,7 +96,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   cv::imshow("Left Image", imLeft);
   cv::imshow("Right Image",imRight);
   cv::waitKey(2);
-  
+
   cout << "Ranging measurement [m] = " << stored_range << endl;
 
   counter++;
@@ -107,30 +108,35 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   Left_img_nsec = msgLeft->header.stamp.nsec;
   Right_img_sec = msgRight->header.stamp.sec;
   Right_img_nsec = msgRight->header.stamp.nsec;
-  Left_mean_timestamp =  (Left_last_timestamp + Left_img_sec + Left_img_nsec/1e9)/2.0;   //mean time stamp used by the range finder synchronization
+  Left_mean_timestamp =  (Left_last_timestamp + Left_img_sec + Left_img_nsec/1e9)/2.0; //mean time stamp used by the range finder synchronization
+  rover_status.header.stamp = ros::Time().now();
+
 
   if (!hit_flag){
     if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040 && (counter%recording_image_rate==0)){
         image_counter1++;
         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
         cv::imwrite(savingName1, imLeft);
-  
+        rover_status.range_distance = -1;
         rangelog << std::to_string(-1)<<endl;
-   //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
-   //groundtruthlog << std::to_string(test_time)<<" - ";
-        for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+        //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
+        //groundtruthlog << std::to_string(test_time)<<" - ";
+        rover_status.image_left = *msgLeft;
+        rover_status.rtk_matrix = rtk_matrix;
+        for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
         boost::posix_time::ptime my_posix_time = msgLeft->header.stamp.toBoost();
         std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
-   //timestamplog << iso_time_str <<endl;
+        //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
-   }
+        }
 
     if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040 && (counter%recording_image_rate==0)){
         image_counter2++;
         std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
         cv::imwrite(savingName2, imRight);
+        rover_status.image_right = *msgRight;
         }
   }
   else {
@@ -140,20 +146,24 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
 	    rangelog << stored_range <<endl;
-	//test_time = last_img_header.stamp.sec + last_img_header.stamp.nsec/1e9 - rtk_timestamp;
-   //groundtruthlog << std::to_string(test_time)<<" - ";
-	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+	    rover_status.range_distance = stored_range;
+	    //test_time = last_img_header.stamp.sec + last_img_header.stamp.nsec/1e9 - rtk_timestamp;
+        //groundtruthlog << std::to_string(test_time)<<" - ";
+        rover_status.rtk_matrix = rtk_matrix;
+	    for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
         if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
             cv::imwrite(savingName1, imLeft);
+            rover_status.image_left = *msgLeft;
             }
         if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040){
 	        image_counter2++;
             std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
             cv::imwrite(savingName2, imRight);
+            rover_status.image_right = *msgRight;
 	        }
       }
     else {
@@ -162,20 +172,24 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
         rangelog << stored_range <<endl;
+        rover_status.range_distance = stored_range;
+        rover_status.rtk_matrix = rtk_matrix;
         //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
         //groundtruthlog << std::to_string(test_time)<<" - ";
-	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
+	    for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
 	    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
             cv::imwrite(savingName1, imLeft);
+            rover_status.image_left = *msgLeft;
             }
         if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040){
 	        image_counter2++;
             std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
             cv::imwrite(savingName2, imRight);
+            rover_status.image_right = *msgRight;
 	    }
     }
     hit_flag = false;
@@ -183,7 +197,8 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
     last_img_header = msgLeft->header;
     Left_last_timestamp = Left_img_sec + Left_img_nsec/1e9;
     Right_last_timestamp = Right_img_sec + Right_img_nsec/1e9;
-    }
+    rover_status_pub.publish(rover_status);
+}
 
 void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message){
   hit_flag = true;
@@ -192,8 +207,8 @@ void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& mes
 }
 
 void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message){
-  matrix = message ->matrix;
-  rtk_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
+    rtk_matrix = message ->matrix;
+    rtk_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
 }
 
 
@@ -202,7 +217,7 @@ int main(int argc, char** argv)
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
   groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);
-  
+
   ros::init(argc, argv, "stereo_ranging_rtk");
   ros::start();
 
@@ -257,6 +272,11 @@ int main(int argc, char** argv)
   //Subscribe to Ranging sensor and RTK
   ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
   ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_groundtruth", 1,&MatchGrabber::GroundTruth_Callback,&igb);
+
+  //TODO: Publish & Subscribe the rover status
+  //ros::Publisher slam_pub = nh.advertise<filter_synchronizer1::slamMsg>("stereoslam_bag", 1000);
+
+  igb.rover_status_pub =  nh.advertise<filter_synchronizer1::slamMsg>("/rover_status", 1);
 
   //ros::Rate loop_rate(100);
   ros::spin();

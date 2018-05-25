@@ -14,7 +14,7 @@
 </node>
 
 
-<node pkg="camera1394stereo" type="camera1394stereo_node" name="camera1394stereo_node1" output="screen" >
+<!--<node pkg="camera1394stereo" type="camera1394stereo_node" name="camera1394stereo_node1" output="screen" >
     <param name="video_mode" value="format7_mode3" />
     <param name="format7_color_coding" value="raw16" />
     <param name="bayer_pattern" value="grbg" />
@@ -26,6 +26,6 @@
     <remap from="/stereo_camera/left/image_raw" to="/camera/left/image_raw" />
     <remap from="/stereo_camera/right/image_raw" to="/camera/right/image_raw" />
 </node>
-<node pkg="dynamic_reconfigure" type="reconfigure_gui" name="reconfigure_gui" output="screen" />
+<node pkg="dynamic_reconfigure" type="reconfigure_gui" name="reconfigure_gui" output="screen" />-->
 
 </launch>

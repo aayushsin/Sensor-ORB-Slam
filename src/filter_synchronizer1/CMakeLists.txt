@@ -49,7 +49,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 add_executable(synchronizer_node1 src/synchronizer1.cpp)
-#add_executable(synchronizer_node2 src/sync2.cpp)
+add_executable(synchronizer_node2 src/sync1.cpp)
 target_link_libraries(synchronizer_node1 ${catkin_LIBRARIES})
-#target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
+target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node1 ${OpenCV_LIBS})
+target_link_libraries(synchronizer_node2 ${OpenCV_LIBS})

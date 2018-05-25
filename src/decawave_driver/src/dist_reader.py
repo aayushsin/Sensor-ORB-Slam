@@ -23,26 +23,10 @@
 import rospy
 import rospkg
 from snowmower_msgs.msg import DecaWaveMsg
-import message_filters
-from message_filters import TimeSynchronizer, Subscriber
-from datetime import datetime
-import string
 import sys,serial, time, os,cv2
 from serial import SerialException
-from decimal import Decimal
-import numpy as np
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
 
-bridge = CvBridge()
-index = 0
-#initial_time = 0
-range_sec = 0
-range_nsec = 0
-#initial_time = 0.0
 
-last_range0 = 0.0
-last_range = 0.0
 #range0 = 0.0
 #last_time = rospy.rostime.Time(0,0)
 
@@ -58,9 +42,8 @@ class DecaWaveDriver:
         self.tag_angle = rospy.get_param('~tag_angle', 0)
         self.beacon_distance = rospy.get_param('~beacon_distance', 0)
         self.dwPub = rospy.Publisher('/ranger_finder/data', DecaWaveMsg, queue_size=5)
-        filepath = str(rospkg.RosPack().get_path('decawave_driver')) + '/src/range_pinakothen_30.csv'
-        fh = open(filepath, "w")
-        #fh = open("/home/aayushsingla/range.csv", "w")
+        #filepath = str(rospkg.RosPack().get_path('decawave_driver')) + '/src/ranging_tests/range.csv'
+        #fh = open(filepath, "w")
         self.last_time = rospy.rostime.Time(0,0)
 
         try:
@@ -77,10 +60,7 @@ class DecaWaveDriver:
             ser.open()
             range0 = 0
             i=1
-            data_array = np.array([])
 
-            #loop_rate = rospy.Rate(100)
-            #time_array = np.array([])
             while (not rospy.is_shutdown()):
                 raw_data = ser.readline()
                 if raw_data == serial.to_bytes([]):
@@ -89,7 +69,7 @@ class DecaWaveDriver:
                     data = raw_data.split(' ')
                     if data[0] == 'mc':
                         dwMsg.header.stamp = rospy.Time.now()
-                        now = dwMsg.header.stamp
+                        #now = dwMsg.header.stamp
                         rospy.loginfo("UW time %f", rospy.get_time())
                         mask = int(data[1], 16)
                         if (mask & 0x01):
@@ -98,11 +78,10 @@ class DecaWaveDriver:
                             if range0 != 0:
                                 print range0
                                 print i
-                                curr_time=rospy.Time.now()
+                                #curr_time=rospy.Time.now()
                                 #print curr_time-self.last_time
                                 #print type(self.last_time)
-                                fh.write(str(range0) + '\n')
-                                #data_array = np.append(data_array, range0)
+                                #fh.write(str(range0) + '\n')
                                 dwMsg.dist = range0
                                 self.dwPub.publish(dwMsg)  # publish the topic
                                 #self.last_time=curr_time
@@ -111,12 +90,7 @@ class DecaWaveDriver:
                             print "range0 bad"
 
             ser.close()
-            fh.close()
-            #print('mean = ' + str(np.mean(data_array)))
-            #print('std  = ' + str(np.std(data_array)))
-            # file.flush()
-            # file.close()
-
+            #fh.close()
 
 
         except SerialException:
