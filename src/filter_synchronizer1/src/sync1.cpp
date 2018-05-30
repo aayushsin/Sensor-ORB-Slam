@@ -18,16 +18,19 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <filter_synchronizer1/slamMsg.h>
+#include <ros/package.h>
 
 using namespace std;
 using namespace message_filters;
 static const std::string OPENCV_WINDOW1 = "Left Image window";
-string Image_path1 = "/home/aayushsingla/catkin_ws/src/left_image_data/";
-string Image_path2 = "/home/aayushsingla/catkin_ws/src/right_image_data/";
-string cali_filename = "/home/aayushsingla/catkin_ws/src/filter_synchronizer/src/bumblebee2.yaml";
-string range_file = "/home/aayushsingla/catkin_ws/src/distance_data/range.txt";
-string timestamp_file = "/home/aayushsingla/catkin_ws/src/time_stamp/time_stamp.txt";
-string groundtruth_file = "/home/aayushsingla/catkin_ws/src/ground_truth/ground_truth.txt";
+string path = ros::package::getPath("filter_synchronizer1");
+string src_path = path.substr(0,path.find_last_of("/\\"));
+string Image_path1 = src_path + "/left_image_data/";
+string Image_path2 = src_path + "/right_image_data/";
+string cali_filename = path + "/src/bumblebee2.yaml";
+string range_file = src_path + "/distance_data/range.txt";
+string timestamp_file = src_path + "/time_stamp/time_stamp.txt";
+string groundtruth_file = src_path + "/ground_truth/ground_truth.txt";
 
 ros::CallbackQueue my_callback_queue;
 ofstream rangelog;
@@ -109,7 +112,6 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   Right_img_sec = msgRight->header.stamp.sec;
   Right_img_nsec = msgRight->header.stamp.nsec;
   Left_mean_timestamp =  (Left_last_timestamp + Left_img_sec + Left_img_nsec/1e9)/2.0; //mean time stamp used by the range finder synchronization
-  rover_status.header.stamp = ros::Time().now();
 
 
   if (!hit_flag){
@@ -120,7 +122,6 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         rover_status.range_distance = -1;
         rangelog << std::to_string(-1)<<endl;
         //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
-        //groundtruthlog << std::to_string(test_time)<<" - ";
         rover_status.image_left = *msgLeft;
         rover_status.rtk_matrix = rtk_matrix;
         for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
@@ -130,6 +131,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
+        rover_status.header.stamp = msgLeft->header.stamp;
         }
 
     if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040 && (counter%recording_image_rate==0)){
@@ -145,6 +147,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
         //timestamplog << iso_time_str <<endl;
         timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
+        rover_status.header.stamp = last_img_header.stamp;
 	    rangelog << stored_range <<endl;
 	    rover_status.range_distance = stored_range;
 	    //test_time = last_img_header.stamp.sec + last_img_header.stamp.nsec/1e9 - rtk_timestamp;
@@ -171,6 +174,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
+        rover_status.header.stamp = msgLeft->header.stamp;
         rangelog << stored_range <<endl;
         rover_status.range_distance = stored_range;
         rover_status.rtk_matrix = rtk_matrix;
@@ -214,6 +218,7 @@ void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& m
 
 int main(int argc, char** argv)
 {
+  std::string path = ros::package::getPath("filter_synchronizer1");
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
   groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);

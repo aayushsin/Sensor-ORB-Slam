@@ -17,15 +17,17 @@
 #include <sensor_msgs/Image.h>
 #include <snowmower_msgs/DecaWaveMsg.h>
 #include <anavs_rtk_dlr/odometry.h>
-#include <filter_synchronizer1/slamMsg.h>
 #include <ros/callback_queue.h>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <ros/package.h>
 
 using namespace std;
 using namespace message_filters;
 static const std::string OPENCV_WINDOW1 = "Left Image window";
-string Image_path1 = "/home/aayushsingla/catkin_ws/src/left_image_data/";
+string path = ros::package::getPath("filter_synchronizer1");
+string src_path = path.substr(0,path.find_last_of("/\\"));
+string Image_path1 = src_path + "/left_image_data/";
 string Image_path2 = "/home/aayushsingla/catkin_ws/src/right_image_data/";
 string cali_filename = "/home/aayushsingla/catkin_ws/src/filter_synchronizer/src/bumblebee2.yaml";
 string range_file = "/home/aayushsingla/catkin_ws/src/distance_data/range.txt";
@@ -102,7 +104,7 @@ int main(int argc, char** argv)
 
   return 0;
 }
-*/
+
 
 class SubscribeAndPublish
 {
@@ -132,6 +134,7 @@ private:
   ros::Subscriber sub_;
 
 };//End of class SubscribeAndPublish
+*/
 
 int main(int argc, char **argv)
 {
@@ -140,7 +143,15 @@ rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,oth
   ros::init(argc, argv, "subscribe_and_publish");
 
   //Create an object of class SubscribeAndPublish that will take care of everything
-  SubscribeAndPublish SAPObject;
+  //SubscribeAndPublish SAPObject;
+  //std::string path = ros::package::getPath("filter_synchronizer1");
+  cout << Image_path1<<endl;
+  //int x = path.find_last_of("/\\");
+  //cout <<path.substr (0,x) <<endl;
+
+  //using ros::package::V_string;
+  //V_string packages;
+  //ros::package::getAll(packages);
 
   ros::spin();
   ros::Rate loop_rate(100);

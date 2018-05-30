@@ -39,9 +39,14 @@ find_package(Boost REQUIRED COMPONENTS thread)
 
 
 catkin_package(
-  LIBRARIES ${PROJECT_NAME}
+##  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
 )
+
+
+###########
+## Build ##
+###########
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -50,7 +55,11 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(synchronizer_node1 src/synchronizer1.cpp)
 add_executable(synchronizer_node2 src/sync1.cpp)
+add_executable(synchronizer_node3 src/sync2.cpp)
+add_dependencies(synchronizer_node2 filter_synchronizer1_generate_messages_cpp)
 target_link_libraries(synchronizer_node1 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
+target_link_libraries(synchronizer_node3 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node1 ${OpenCV_LIBS})
 target_link_libraries(synchronizer_node2 ${OpenCV_LIBS})
+target_link_libraries(synchronizer_node3 ${OpenCV_LIBS})
