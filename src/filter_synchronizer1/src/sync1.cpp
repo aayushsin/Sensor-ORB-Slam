@@ -218,7 +218,6 @@ void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& m
 
 int main(int argc, char** argv)
 {
-  std::string path = ros::package::getPath("filter_synchronizer1");
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
   groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);
@@ -228,8 +227,8 @@ int main(int argc, char** argv)
 
   MatchGrabber igb;
 
-  cv::FileStorage fsSettings(string(argv[1]), cv::FileStorage::READ);
-
+  //cv::FileStorage fsSettings(string(argv[1]), cv::FileStorage::READ);
+  cv::FileStorage fsSettings(cali_filename, cv::FileStorage::READ);
 
   if(!fsSettings.isOpened())
   {
