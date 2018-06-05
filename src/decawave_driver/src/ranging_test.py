@@ -43,7 +43,7 @@ if __name__ == "__main__":
         #plt.xlim(109.5,110.5)
         plt.plot(dist_space, kde(dist_space),'b')
         plt.plot(x_th,mlab.normpdf(x_th, mean, sigma),'r')
-        plt.savefig('Range_Pinakothen_110.png')
+        plt.savefig('ranging_tests/Range_pinakothen_11  0_1.png')
         plt.show()
         print 'Mean : ' + str(np.mean(data))
         print 'Standard Deviation :' + str(np.std(data))
