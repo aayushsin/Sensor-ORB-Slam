@@ -43,8 +43,8 @@ class AnavsRTKNode:
         self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
         self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
         rospy.init_node('anavs_rtk_node', anonymous=True)
-        self.filepath = str(rospkg.RosPack().get_path('anavs_rtk_dlr')) + '/ground_truth'
-        self.file_s = open(self.filepath, "w")
+        #self.filepath = str(rospkg.RosPack().get_path('anavs_rtk_dlr')) + '/ground_truth'
+        #self.file_s = open(self.filepath, "w")
 
         # ------------------------------------------------------------------------------
         # create connection
@@ -69,7 +69,7 @@ class AnavsRTKNode:
                         self.build_time(current_time)
 
             rate.sleep()
-        self.file_s.close()
+        #self.file_s.close()
 
     def parse_data_ubx(self):
         header = chr(int('0xb5', 16)) + chr(int('0x62', 16)) + chr(int('0x02', 16)) + chr(int('0xe0', 16))
@@ -105,8 +105,8 @@ class AnavsRTKNode:
         rotation_matrix = self.build_r1(self.parser.bank) * self.build_r2(self.parser.elevation) * self.build_r3(
             self.parser.heading)
         self.rtk_groundtruth.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
-        self.file_s.write(str(current_time) + str(np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])) + '\n')
-        print np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        #self.file_s.write(str(current_time) + str(np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])) + '\n')
+        #print np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
         #self.odometry_msg.pose.covariance[0] = 0.001
         #self.odometry_msg.pose.covariance[7] = 0.001

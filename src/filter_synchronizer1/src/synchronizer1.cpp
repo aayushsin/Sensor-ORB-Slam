@@ -17,17 +17,27 @@
 #include <ros/callback_queue.h>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <ros/package.h>
 
 using namespace std;
 using namespace message_filters;
 static const std::string OPENCV_WINDOW1 = "Left Image window";
-string Image_path1 = "/home/aayushsingla/catkin_ws/src/left_image_data/";
+string path = ros::package::getPath("filter_synchronizer1");
+string src_path = path.substr(0,path.find_last_of("/\\"));
+string Image_path1 = src_path + "/storage/left_image_data/";
+string Image_path2 = src_path + "/storage/right_image_data/";
+string cali_filename = path + "/src/bumblebee2.yaml";
+string range_file = src_path + "/storage/distance_data/range.txt";
+string timestamp_file = src_path + "/storage/time_stamp/time_stamp.txt";
+string groundtruth_file = src_path + "/storage/ground_truth/ground_truth.txt";
+
+/*string Image_path1 = "/home/aayushsingla/catkin_ws/src/left_image_data/";
 string Image_path2 = "/home/aayushsingla/catkin_ws/src/right_image_data/";
 string cali_filename = "/home/aayushsingla/catkin_ws/src/filter_synchronizer/src/bumblebee2.yaml";
 string range_file = "/home/aayushsingla/catkin_ws/src/distance_data/range.txt";
 string timestamp_file = "/home/aayushsingla/catkin_ws/src/time_stamp/time_stamp.txt";
 string groundtruth_file = "/home/aayushsingla/catkin_ws/src/ground_truth/ground_truth.txt";
-
+*/
 ros::CallbackQueue my_callback_queue;
 ofstream rangelog;
 ofstream timestamplog;
@@ -114,16 +124,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         image_counter1++;
         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
         cv::imwrite(savingName1, imLeft);
-  
         rangelog << std::to_string(-1)<<endl;
-   //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
-   //groundtruthlog << std::to_string(test_time)<<" - ";
         for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
         boost::posix_time::ptime my_posix_time = msgLeft->header.stamp.toBoost();
         std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
-   //timestamplog << iso_time_str <<endl;
+        //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
    }
 
@@ -140,8 +147,6 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
 	    rangelog << stored_range <<endl;
-	//test_time = last_img_header.stamp.sec + last_img_header.stamp.nsec/1e9 - rtk_timestamp;
-   //groundtruthlog << std::to_string(test_time)<<" - ";
 	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
@@ -162,8 +167,6 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         //timestamplog << iso_time_str <<endl;
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
         rangelog << stored_range <<endl;
-        //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;
-        //groundtruthlog << std::to_string(test_time)<<" - ";
 	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
@@ -208,7 +211,8 @@ int main(int argc, char** argv)
 
   MatchGrabber igb;
 
-  cv::FileStorage fsSettings(string(argv[1]), cv::FileStorage::READ);
+  //cv::FileStorage fsSettings(string(argv[1]), cv::FileStorage::READ);
+   cv::FileStorage fsSettings(cali_filename, cv::FileStorage::READ);
 
 
   if(!fsSettings.isOpened())
