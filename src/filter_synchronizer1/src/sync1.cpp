@@ -119,6 +119,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         image_counter1++;
         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
         cv::imwrite(savingName1, imLeft);
+
         rover_status.range_distance = -1;
         rangelog << std::to_string(-1)<<endl;
         //test_time = msgLeft->header.stamp.sec + msgLeft->header.stamp.nsec/1e9 - rtk_timestamp;

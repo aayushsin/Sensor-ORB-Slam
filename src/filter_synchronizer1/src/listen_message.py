@@ -6,7 +6,7 @@ from filter_synchronizer1.msg import slamMsg
 
 def callback(msg):
     time = msg.header.stamp
-    print(time)
+    print(msg.image_l_mat)
     print msg.range
 
 
