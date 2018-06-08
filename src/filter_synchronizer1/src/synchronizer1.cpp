@@ -23,13 +23,14 @@ using namespace std;
 using namespace message_filters;
 static const std::string OPENCV_WINDOW1 = "Left Image window";
 string path = ros::package::getPath("filter_synchronizer1");
-string src_path = path.substr(0,path.find_last_of("/\\"));
-string Image_path1 = src_path + "/storage/left_image_data/";
-string Image_path2 = src_path + "/storage/right_image_data/";
+//string src_path = path.substr(0,path.find_last_of("/\\"));
+string wk_path = path.substr(0,path.find("/src/"));
+string Image_path1 = wk_path + "/storage/left_image_data/";
+string Image_path2 = wk_path + "/storage/right_image_data/";
 string cali_filename = path + "/src/bumblebee2.yaml";
-string range_file = src_path + "/storage/distance_data/range.txt";
-string timestamp_file = src_path + "/storage/time_stamp/time_stamp.txt";
-string groundtruth_file = src_path + "/storage/ground_truth/ground_truth.txt";
+string range_file = wk_path + "/storage/distance_data/range.txt";
+string timestamp_file = wk_path + "/storage/time_stamp/time_stamp.txt";
+string groundtruth_file = wk_path + "/storage/ground_truth/ground_truth.txt";
 
 /*string Image_path1 = "/home/aayushsingla/catkin_ws/src/left_image_data/";
 string Image_path2 = "/home/aayushsingla/catkin_ws/src/right_image_data/";
@@ -208,6 +209,7 @@ int main(int argc, char** argv)
   
   ros::init(argc, argv, "stereo_ranging_rtk");
   ros::start();
+
 
   MatchGrabber igb;
 
