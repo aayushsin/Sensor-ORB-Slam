@@ -1,7 +1,7 @@
 <launch>
 
   <!-- start the driver in a camera_nodelet_manager process -->
-  <include file="$(find camera1394stereo)/launch/stereo_nodelet_manager.launch" />
+  <include file="$(find camera1394stereo)/nodelet_manager1.launch" />
 
   <!-- Bayer color decoding -->
   <node pkg="nodelet" type="nodelet" name="image_proc_debayer"

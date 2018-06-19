@@ -18,6 +18,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <ros/package.h>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace message_filters;
@@ -59,6 +60,7 @@ double rtk_timestamp = 0.0;
 
 bool hit_flag = false;       //a match hit when dataset from three topics available
 int recording_image_rate = 2;  //recording rate for dataset
+double recording_image_frequency = 0.040; // in seconds
 int counter = 0;
 
 class MatchGrabber{
@@ -107,11 +109,16 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   cv::imshow("Right Image",imRight);
   cv::waitKey(2);
   
-  cout << "Ranging measurement [m] = " << stored_range << endl;
+  if (stored_range == 0) {
+    cout << "Ranging measurement [m] = -1" << endl;
+    }
+  else {
+    cout << "Ranging measurement [m] = " << stored_range << endl;
+    }
 
   counter++;
-  static int image_counter1 = 0; //Left Image Counter
-  static int image_counter2 = 0; //Right Image Counter
+  static int image_counter1 = -1; //Left Image Counter
+  static int image_counter2 = -1; //Right Image Counter
 
 
   Left_img_sec = msgLeft->header.stamp.sec;
@@ -121,7 +128,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   Left_mean_timestamp =  (Left_last_timestamp + Left_img_sec + Left_img_nsec/1e9)/2.0;   //mean time stamp used by the range finder synchronization
 
   if (!hit_flag){
-    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040 && (counter%recording_image_rate==0)){
+    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_frequency && (counter%recording_image_rate==0)){
         image_counter1++;
         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
         cv::imwrite(savingName1, imLeft);
@@ -135,7 +142,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
    }
 
-    if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040 && (counter%recording_image_rate==0)){
+    if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_frequency && (counter%recording_image_rate==0)){
         image_counter2++;
         std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
         cv::imwrite(savingName2, imRight);
@@ -151,12 +158,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
 	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
-        if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040){
+        if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_frequency){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
             cv::imwrite(savingName1, imLeft);
             }
-        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040){
+        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_frequency){
 	        image_counter2++;
             std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
             cv::imwrite(savingName2, imRight);
@@ -171,12 +178,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
 	    for (std::vector<double>::const_iterator i = matrix.begin(); i != matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
-	    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > 0.040){
+	    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_frequency){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
             cv::imwrite(savingName1, imLeft);
             }
-        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > 0.040){
+        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_frequency){
 	        image_counter2++;
             std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".jpg";
             cv::imwrite(savingName2, imRight);
@@ -203,13 +210,29 @@ void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& m
 
 int main(int argc, char** argv)
 {
+  ros::init(argc, argv, "stereo_ranging_rtk");
+  ros::start();
+  ros::Time current = ros::Time::now();
+  boost::posix_time::ptime current_posix_time = current.toBoost();
+  std::string current_iso_time = boost::posix_time::to_iso_extended_string(current_posix_time).substr(0,19); // get current UTC time
+  replace(current_iso_time.begin(), current_iso_time.end(), 'T', '_');
+  replace(current_iso_time.begin(), current_iso_time.end(), ':', '-');
+  std::string foldername = "storage_" + current_iso_time;
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername);
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername +"/distance_data");
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername + "/ground_truth");
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+ "/left_image_data");
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+"/right_image_data");
+  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+"/time_stamp");
+  Image_path1 = wk_path + "/storage/"+ foldername + "/left_image_data/";
+  Image_path2 = wk_path + "/storage/"+ foldername + "/right_image_data/";
+  range_file = wk_path + "/storage/"+ foldername + "/distance_data/range.txt";
+  timestamp_file = wk_path + "/storage/"+ foldername + "/time_stamp/time_stamp.txt";
+  groundtruth_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth.txt";
+
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
   groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);
-  
-  ros::init(argc, argv, "stereo_ranging_rtk");
-  ros::start();
-
 
   MatchGrabber igb;
 
@@ -252,6 +275,8 @@ int main(int argc, char** argv)
   cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,igb.M1r,igb.M2r);
 
   ros::NodeHandle nh;
+    ros::param::get("~recording_counter", recording_image_rate);
+  ros::param::get("~recording_frequency", recording_image_frequency);
 
   //Subscribe to camera
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
@@ -262,7 +287,7 @@ int main(int argc, char** argv)
 
   //Subscribe to Ranging sensor and RTK
   ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
-  ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_groundtruth", 1,&MatchGrabber::GroundTruth_Callback,&igb);
+  ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_odometry", 1,&MatchGrabber::GroundTruth_Callback,&igb);
 
   //ros::Rate loop_rate(100);
   ros::spin();

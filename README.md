@@ -32,22 +32,28 @@ self.dwPort = rospy.get_param('~port','dev/ttyACM0') in catkin_ws/src/decawave_d
 9. Run the ANavsWizard for UBX solution after connecting to wifi SSID: ANavs_RTK_Server
 10. Change the IP of your ANavs_PI in src/anavs_rtk_dlr/src/anavs_rtk_node.py in variable self.tcp_ip
 11. Terminal1: roslaunch read_dw_camera_dist.launch
-12. ./run.sh or ./run_old.sh
+12. roaslaunch filter_sychronizer1 synchronizer.launch
 
 ========
 Denotation
 ========
 1. On Terminal1 the "image 0" corresponding to left camera image, "image 1" to right camera image, followed by the counter for the image pair, and absolute ros time, in between there would be "UW time" referred to the data from range finder followed by ros time and distance in m. Also, the RTK output data is shown
 2. On Terminal2, "Ranging measurement [m]"should be printed out.
+3. /rtk_odometry rostopic for rtk position and rotation matrix alongwith rostime
+4. tum_nav/sync_camera_rtk for synchronized topic with images, rtk and ranging measurements
 
 ========
 Storage
 ========
 ######Note the storing rate could be set:
-cd /*/catkin_ws/src/filter_synchronizer1/src/, in synchronizer1.cpp "recording_image_rate" default as 2, which means the storage is implemented once every two images. Change it accordingly to  your application.
+cd /*/catkin_ws/src/filter_synchronizer1/launch/, in synchronizer.launch "recording_counter" default as 2, which means the storage is implemented once every two images. Change it accordingly to  your application.
+Moreover, recording_frequency refers to the time difference between two subsequent images.
 
-1. cd /*/catkin_ws/src/storage/left_image_data/, the left images are stored here
-2. cd /*/catkin_ws/src/storage/right_image_data/, the right images are stored here
-3. cd /*/catkin_ws/src/storage/distance_data/, the distances are stored in the range.txt file
-4. cd /*/catkin_ws/src/storage/time_stamp/, the timestamps are stored in the time_stamp.txt file
-5. cd /*/catkin_ws/src/storage/ground_truth/, the groundtruth are stored in the ground_truth.txt file
+1. cd /*/catkin_ws/src/storage/strorage***/left_image_data/, the left images are stored here
+2. cd /*/catkin_ws/src/storage/strorage***/right_image_data/, the right images are stored here
+3. cd /*/catkin_ws/src/storage/strorage***/distance_data/, the distances are stored in the range.txt file
+4. cd /*/catkin_ws/src/storage/strorage***/time_stamp/, the timestamps are stored in the time_stamp.txt file
+5. cd /*/catkin_ws/src/storage/strorage***/ground_truth/, the groundtruth are stored in the ground_truth.txt file
+
+
+

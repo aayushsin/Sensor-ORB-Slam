@@ -77,15 +77,9 @@ class DecaWaveDriver:
                             range0 = int(data[2], 16) / 1000.0
                             if range0 != 0:
                                 print range0
-                                print i
-                                #curr_time=rospy.Time.now()
-                                #print curr_time-self.last_time
-                                #print type(self.last_time)
-                                #fh.write(str(range0) + '\n')
                                 dwMsg.dist = range0
                                 self.dwPub.publish(dwMsg)  # publish the topic
-                                #self.last_time=curr_time
-                                i=i+1
+                                #i=i+1
                         else:
                             print "range0 bad"
 

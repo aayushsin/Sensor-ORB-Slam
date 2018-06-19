@@ -1,3 +1,3 @@
 <launch>
-    <node pkg="rosbag" type="record" name="record" output="screen" args="-O /home/aayushsingla/catkin_ws/src/bag_images/subset /rover_status"/>
+    <node pkg="rosbag" type="record" name="record" output="screen" args="-O /home/aayushsingla/catkin_ws/src/bag_images/subset_sync /tum_nav/sync_data"/>
 </launch>
