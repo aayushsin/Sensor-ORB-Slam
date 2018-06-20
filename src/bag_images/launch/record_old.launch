@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="rosbag" type="record" name="record" output="screen" args="-O /home/aayushsingla/catkin_ws/src/bag_images/subset_compressed /camera/left/image_raw/compressed /camera/right/image_raw/compressed /ranger_finder/data /rtk_odometry"/>
-</launch>
