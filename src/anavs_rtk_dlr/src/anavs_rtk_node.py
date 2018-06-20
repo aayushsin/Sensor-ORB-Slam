@@ -94,10 +94,12 @@ class AnavsRTKNode:
         self.odometry_msg.pose.pose.position.z = self.parser.baseline_z
 
         translation_vector = np.array([[self.parser.baseline_x, self.parser.baseline_y, self.parser.baseline_z]])
+        euler_angles = np.array([[self.parser.bank*np.pi/180,self.parser.elevation*np.pi/180,self.parser.heading*np.pi/180]])
         self.rtk_groundtruth.header.stamp = current_time
         self.rtk_groundtruth.header.frame_id = "world"
-        rotation_matrix = self.build_r1(self.parser.bank) * self.build_r2(self.parser.elevation) * self.build_r3(
-            self.parser.heading)
+        rotation_matrix = self.build_r1(self.parser.bank*np.pi/180) * self.build_r2(self.parser.elevation*np.pi/180) * self.build_r3(
+            self.parser.heading*np.pi/180)
+        self.rtk_groundtruth.matrix_euler = np.concatenate([translation_vector.flatten(),euler_angles.flatten()])
         self.rtk_groundtruth.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
         self.pub_odometry.publish(self.rtk_groundtruth)

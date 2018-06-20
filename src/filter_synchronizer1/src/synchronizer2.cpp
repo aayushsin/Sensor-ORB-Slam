@@ -27,17 +27,19 @@ static const std::string OPENCV_WINDOW1 = "Left Image window";
 string path = ros::package::getPath("filter_synchronizer1");
 //string src_path = path.substr(0,path.find_last_of("/\\"));
 string wk_path = path.substr(0,path.find("/src/"));
-string Image_path1 ;
-string Image_path2 ;
+string Image_path1;
+string Image_path2;
 string cali_filename = path + "/src/bumblebee2.yaml";
-string range_file ;
-string timestamp_file ;
-string groundtruth_file ;
+string range_file;
+string timestamp_file;
+string groundtruth_file;
+string groundtrutheuler_file;
 
 ros::CallbackQueue my_callback_queue;
 ofstream rangelog;
 ofstream timestamplog;
 ofstream groundtruthlog;
+ofstream groundtrutheulerlog;
 std_msgs::Header last_img_header;
 
 int Left_img_sec = 0;
@@ -68,6 +70,7 @@ public:
   cv::Mat M1l,M2l,M1r,M2r;
   float stored_range = 0.0;
   std::vector<double> rtk_matrix;
+  std::vector<double> matrix_euler;
   ros::Publisher rover_sync_data_pub;
   filter_synchronizer1::slamMsg rover_sync_data;
 };
@@ -132,9 +135,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             rangelog << std::to_string(-1)<<endl;
             rover_sync_data.image_left = *msgLeft;
             rover_sync_data.rtk_matrix = rtk_matrix;
+            rover_sync_data.matrix_euler = matrix_euler;
             for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
                 groundtruthlog << *i << " ";
             groundtruthlog <<""<<endl;
+            for (std::vector<double>::const_iterator i = matrix_euler.begin(); i != matrix_euler.end(); ++i)
+                groundtrutheulerlog << *i << " ";
+            groundtrutheulerlog <<""<<endl;
         //boost::posix_time::ptime my_posix_time = msgLeft->header.stamp.toBoost();
         //std::string iso_time_str = boost::posix_time::to_iso_extended_string(my_posix_time);
         //timestamplog << iso_time_str <<endl;
@@ -187,9 +194,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
 	    rangelog << stored_range <<endl;
 	    rover_sync_data.range_distance = stored_range;
         rover_sync_data.rtk_matrix = rtk_matrix;
+        rover_sync_data.matrix_euler = matrix_euler;
 	    for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
+        for (std::vector<double>::const_iterator i = matrix_euler.begin(); i != matrix_euler.end(); ++i)
+            groundtrutheulerlog << *i << " ";
+        groundtrutheulerlog <<""<<endl;
         if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_frequency){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
@@ -212,9 +223,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         rangelog << stored_range <<endl;
         rover_sync_data.range_distance = stored_range;
         rover_sync_data.rtk_matrix = rtk_matrix;
+        rover_sync_data.matrix_euler = matrix_euler;
 	    for (std::vector<double>::const_iterator i = rtk_matrix.begin(); i != rtk_matrix.end(); ++i)
             groundtruthlog << *i << " ";
         groundtruthlog <<""<<endl;
+        for (std::vector<double>::const_iterator i = matrix_euler.begin(); i != matrix_euler.end(); ++i)
+            groundtrutheulerlog << *i << " ";
+        groundtrutheulerlog <<""<<endl;
 	    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_frequency){
             image_counter1++;
             std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".jpg";
@@ -244,6 +259,7 @@ void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& mes
 
 void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message){
     rtk_matrix = message ->matrix;
+    matrix_euler = message ->matrix_euler;
     rtk_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
 }
 
@@ -256,7 +272,8 @@ int main(int argc, char** argv)
   boost::posix_time::ptime current_posix_time = current.toBoost();
   std::string current_iso_time = boost::posix_time::to_iso_extended_string(current_posix_time).substr(0,19); // get current UTC time
   replace(current_iso_time.begin(), current_iso_time.end(), 'T', '_');
-  replace(current_iso_time.begin(), current_iso_time.end(), ':', '-');
+  //replace(current_iso_time.begin(), current_iso_time.end(), ':', '');
+  current_iso_time.erase(std::remove(current_iso_time.begin(), current_iso_time.end(), ':'), current_iso_time.end());
   std::string foldername = "storage_" + current_iso_time;
   boost::filesystem::create_directories(wk_path+"/storage/"+foldername);
   boost::filesystem::create_directories(wk_path+"/storage/"+foldername +"/distance_data");
@@ -269,10 +286,12 @@ int main(int argc, char** argv)
   range_file = wk_path + "/storage/"+ foldername + "/distance_data/range.txt";
   timestamp_file = wk_path + "/storage/"+ foldername + "/time_stamp/time_stamp.txt";
   groundtruth_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth.txt";
+  groundtrutheuler_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth_euler.txt";
 
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
   groundtruthlog.open (groundtruth_file,ios::out | ios::trunc);
+  groundtrutheulerlog.open (groundtrutheuler_file,ios::out | ios::trunc);
 
   MatchGrabber igb;
 
@@ -346,6 +365,7 @@ int main(int argc, char** argv)
   rangelog.close();
   timestamplog.close();
   groundtruthlog.close();
+  groundtrutheulerlog.close();
   hit_flag = false;
 
   return 0;
