@@ -34,7 +34,9 @@ class AnavsRTKNode:
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
-        self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1")
+        #self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav 
+        self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.20.13") # dlr-kn (pw: #LocoExplo#)
+        #self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
 
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
@@ -87,7 +89,7 @@ class AnavsRTKNode:
 
     def build_odometry_msg(self, current_time, code):
         self.odometry_msg.header.stamp = current_time
-        self.odometry_msg.header.frame_id = "world"
+        self.odometry_msg.header.frame_id = "base"
 
         self.odometry_msg.pose.pose.position.x = self.parser.baseline_x
         self.odometry_msg.pose.pose.position.y = self.parser.baseline_y
@@ -95,10 +97,13 @@ class AnavsRTKNode:
 
         translation_vector = np.array([[self.parser.baseline_x, self.parser.baseline_y, self.parser.baseline_z]])
         euler_angles = np.array([[self.parser.bank*np.pi/180,self.parser.elevation*np.pi/180,self.parser.heading*np.pi/180]])
-        self.rtk_groundtruth.header.stamp = current_time
-        self.rtk_groundtruth.header.frame_id = "world"
+        
         rotation_matrix = self.build_r1(self.parser.bank*np.pi/180) * self.build_r2(self.parser.elevation*np.pi/180) * self.build_r3(
-            self.parser.heading*np.pi/180)
+	  self.parser.heading*np.pi/180)
+	rotation_matrix = np.asarray(rotation_matrix)
+        
+        self.rtk_groundtruth.header.stamp = current_time
+        self.rtk_groundtruth.header.frame_id = "base"
         self.rtk_groundtruth.matrix_euler = np.concatenate([translation_vector.flatten(),euler_angles.flatten()])
         self.rtk_groundtruth.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
 
@@ -107,18 +112,18 @@ class AnavsRTKNode:
         #self.pub_odometry.publish(self.odometry_msg)
 
     def build_r1(self, alpha):
-        rot_matrix = np.array(
-            [[1, 0, 0], [0, math.cos(alpha), math.sin(alpha)], [0, -math.sin(alpha), math.cos(alpha)]])
+        rot_matrix = np.matrix(
+            [[1, 0, 0], [0, math.cos(alpha), -math.sin(alpha)], [0, math.sin(alpha), math.cos(alpha)]])
         return rot_matrix
 
     def build_r2(self, alpha):
-        rot_matrix = np.array(
-            [[math.cos(alpha), 0, -math.sin(alpha)], [0, 1, 0], [math.sin(alpha), 0, math.cos(alpha)]])
+        rot_matrix = np.matrix(
+            [[math.cos(alpha), 0, math.sin(alpha)], [0, 1, 0], [-math.sin(alpha), 0, math.cos(alpha)]])
         return rot_matrix
 
     def build_r3(self, alpha):
-        rot_matrix = np.array(
-            [[math.cos(alpha), math.sin(alpha), 0], [-math.sin(alpha), math.cos(alpha), 0], [0, 0, 1]])
+        rot_matrix = np.matrix(
+            [[math.cos(alpha), -math.sin(alpha), 0], [math.sin(alpha), math.cos(alpha), 0], [0, 0, 1]])
         return rot_matrix
 
     def build_nav_msg(self, current_time):

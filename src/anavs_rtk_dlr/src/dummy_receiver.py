@@ -17,7 +17,7 @@ conn, addr = sock.accept()
 
 def handler(clientsock,addr):
 	while True:
-		fp=open('dummy_data.txt')
+		fp=open('PAD_solution.txt')
 		
 		for i in range(1000):
 			byte = fp.read(1000)
