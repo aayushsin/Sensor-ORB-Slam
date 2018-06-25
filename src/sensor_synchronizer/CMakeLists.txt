@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(filter_synchronizer1)
+project(sensor_synchronizer)
 SET(CMAKE_CXX_FLAGS "-std=c++11")
 set(OpenCV_DIR /usr/share/OpenCV/)
 find_package(catkin REQUIRED COMPONENTS 
@@ -27,8 +27,7 @@ find_package(Boost REQUIRED COMPONENTS thread)
  add_message_files(
    FILES
    DecaWaveMsg.msg
-   odometry.msg
-   slamMsg.msg
+   SyncDataMsg.msg
  )
 
  generate_messages(
@@ -53,11 +52,11 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # common source files for both node and nodelet driver interfaces
 
 
-add_executable(synchronizer_node1 src/synchronizer1.cpp)
-add_executable(synchronizer_node2 src/synchronizer2.cpp)
+add_executable(synchronizer_node1 src/synchronizer.cpp)
+add_executable(synchronizer_node2 src/synchronizer1.cpp)
 #add_executable(synchronizer_node3 src/sync2.cpp)
-add_dependencies(synchronizer_node2 filter_synchronizer1_generate_messages_cpp)
-#add_dependencies(synchronizer_node3 filter_synchronizer1_generate_messages_cpp)
+add_dependencies(synchronizer_node1 sensor_synchronizer_generate_messages_cpp)
+#add_dependencies(synchronizer_node3 sensor_synchronizer_generate_messages_cpp)
 target_link_libraries(synchronizer_node1 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
 #target_link_libraries(synchronizer_node3 ${catkin_LIBRARIES})

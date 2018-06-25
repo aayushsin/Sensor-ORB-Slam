@@ -28,7 +28,9 @@
 </node>
 <!--<node pkg="dynamic_reconfigure" type="reconfigure_gui" name="reconfigure_gui" output="screen" />-->
 
-<node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen" />
+<node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen" >
+     <param name="rtk_module_ip" value="192.168.20.13"/>
+</node>
 
       <!--<node name="$(anon dynparam)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters /camera/left/image_raw/compressed">-->
             <!--<param name="format" value="png" />-->

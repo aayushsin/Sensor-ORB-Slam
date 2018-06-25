@@ -1,5 +1,5 @@
 <package>
-  <name>filter_synchronizer1</name>
+  <name>sensor_synchronizer</name>
   <version>1.0.0</version>
   <description>This is a modified version of the ROS driver for devices supporting the IEEE 
     1394 Digital Camera (IIDC) protocol in package camera1394. 

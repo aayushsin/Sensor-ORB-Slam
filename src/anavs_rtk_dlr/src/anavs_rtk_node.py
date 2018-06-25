@@ -34,14 +34,13 @@ class AnavsRTKNode:
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
-        #self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav 
-        self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.20.13") # dlr-kn (pw: #LocoExplo#)
-        #self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
+        # self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav
+        self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.13")  # dlr-kn (pw: #LocoExplo#)
+        # self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
 
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
         self.pub_odometry = rospy.Publisher('rtk_odometry', odom, queue_size=10)
-        #self.pub_rtk_groundtruth = rospy.Publisher('rtk_groundtruth', odom, queue_size=10)
         self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
         self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
         rospy.init_node('anavs_rtk_node', anonymous=True)
@@ -61,8 +60,8 @@ class AnavsRTKNode:
             if self.tcp_socket in readable:
                 self.text_buffer += self.tcp_socket.recv(4096)
                 if self.parse_data_ubx():
-                    #TODO: Remove 1 from the statement
-                    if self.parser.code == 4 or self.parser.code == 5 or self.parser.code == 1: ## 1 added just for test
+                    # TODO: Remove 1 from the statement
+                    if self.parser.code == 4 or self.parser.code == 5 or self.parser.code == 1:  ## 1 added just for test
                         current_time = rospy.Time.now()
                         self.build_odometry_msg(current_time, self.parser.code)
                         self.build_nav_msg(current_time)
@@ -96,20 +95,24 @@ class AnavsRTKNode:
         self.odometry_msg.pose.pose.position.z = self.parser.baseline_z
 
         translation_vector = np.array([[self.parser.baseline_x, self.parser.baseline_y, self.parser.baseline_z]])
-        euler_angles = np.array([[self.parser.bank*np.pi/180,self.parser.elevation*np.pi/180,self.parser.heading*np.pi/180]])
-        
-        rotation_matrix = self.build_r1(self.parser.bank*np.pi/180) * self.build_r2(self.parser.elevation*np.pi/180) * self.build_r3(
-	  self.parser.heading*np.pi/180)
-	rotation_matrix = np.asarray(rotation_matrix)
-        
+        euler_angles = np.array(
+            [[self.parser.bank * np.pi / 180, self.parser.elevation * np.pi / 180, self.parser.heading * np.pi / 180]])
+
+        rotation_matrix = self.build_r1(self.parser.bank * np.pi / 180) * self.build_r2(
+            self.parser.elevation * np.pi / 180) * self.build_r3(self.parser.heading * np.pi / 180)
+        rotation_matrix = np.asarray(rotation_matrix)
+
         self.rtk_groundtruth.header.stamp = current_time
         self.rtk_groundtruth.header.frame_id = "base"
-        self.rtk_groundtruth.matrix_euler = np.concatenate([translation_vector.flatten(),euler_angles.flatten()])
-        self.rtk_groundtruth.matrix = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        self.rtk_groundtruth.rtk_matrix_euler = np.concatenate([translation_vector.flatten(), euler_angles.flatten()])
+        self.rtk_groundtruth.rtk_matrix_rotm = np.concatenate([translation_vector.flatten(), rotation_matrix.flatten()])
+        self.rtk_groundtruth.rtk_longitude = self.parser.longitude
+        self.rtk_groundtruth.rtk_latitude = self.parser.latitude
+
 
         self.pub_odometry.publish(self.rtk_groundtruth)
 
-        #self.pub_odometry.publish(self.odometry_msg)
+        # self.pub_odometry.publish(self.odometry_msg)
 
     def build_r1(self, alpha):
         rot_matrix = np.matrix(

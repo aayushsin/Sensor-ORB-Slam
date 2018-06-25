@@ -40,7 +40,7 @@ class ImageCreator():
         self.bridge = CvBridge()
 
         # open the timetamp file
-        fh = open(str(save_dir) + "/timestamp.txt", "w")
+        #fh = open(str(save_dir) + "/timestamp.txt", "w")
 
         # Open bag file.
         with rosbag.Bag(filename, 'r') as bag:
@@ -62,7 +62,7 @@ class ImageCreator():
                         image_name = str(save_dir) + "/left/Left_image" + str(self.image_counter1) + ".jpg"
                         cv.imwrite(image_name, cv_image)
                         self.image_counter1 += 1
-                        fh.write(timestr + '\n')
+                        #fh.write(timestr + '\n')
                         self.lastCaptureTime_left = msg.header.stamp.to_nsec()
 
                 if topic == "/camera/right/image_raw":
@@ -79,7 +79,7 @@ class ImageCreator():
                         cv.imwrite(image_name, cv_image)
                         self.image_counter2 += 1
                         self.lastCaptureTime_right = msg.header.stamp.to_nsec()
-            fh.close()
+            #fh.close()
 
 
 # Main function.
