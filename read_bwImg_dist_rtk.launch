@@ -32,7 +32,7 @@
     <remap from="/stereo_camera/left/image_raw" to="/camera/left/image_raw" />
     <remap from="/stereo_camera/right/image_raw" to="/camera/right/image_raw" />
 </node>
-<node pkg="dynamic_reconfigure" type="reconfigure_gui" name="reconfigure_gui" output="screen" />
+<node pkg="rqt_reconfigure" type="rqt_reconfigure" name="reconfigure_gui" output="screen" />
 
 <node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen" >
      <param name="rtk_module_ip" value="192.168.20.13"/>

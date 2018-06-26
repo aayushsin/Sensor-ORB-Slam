@@ -10,7 +10,8 @@
     <param name="camera_info_url_right" value="" />
   </node>
   
-  <node pkg="dynamic_reconfigure" type="reconfigure_gui" name="reconfigure_gui" output="screen" />
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="reconfigure_gui" output="screen" />
+
   
   <node pkg="image_view" type="image_view" name="image_view_left">
     <remap from="image" to="stereo_camera/left/image_raw" />
