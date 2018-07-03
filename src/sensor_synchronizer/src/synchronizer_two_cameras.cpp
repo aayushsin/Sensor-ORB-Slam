@@ -362,8 +362,8 @@ int main(int argc, char** argv)
   ros::param::get("~recording_image_second", recording_image_second);
 //  ros::param::get("~use_frequency", use_frequency);
   //Subscribe to camera
-  message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
-  message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
+  message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/ueye/camera_ueye/image_raw", 1);
+  message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/chameleon/camera/image_raw", 1);
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol1;
   message_filters::Synchronizer<sync_pol1> sync1(sync_pol1(1), left_sub, right_sub);
   sync1.registerCallback(boost::bind(&MatchGrabber::Callback, &igb, _1, _2));

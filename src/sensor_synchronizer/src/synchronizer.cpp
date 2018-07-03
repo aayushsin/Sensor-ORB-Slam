@@ -57,6 +57,8 @@ double Right_mean_timestamp = 0.0;
 double test_time = 0.0;
 double rtk_timestamp = 0.0;
 
+bool storage_mode = true;     //turn on storage mode
+bool use_time_difference = true;        //use time as storing parameter
 bool hit_flag = false;       //a match hit when dataset from three topics available
 int recording_image_frame = 2;  //recording rate for dataset
 double recording_image_second = 0.040; // in seconds
@@ -141,130 +143,173 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
         rover_sync_data.rtk_latitude = rtk_latitude;
         rover_sync_data.rtk_longitude =rtk_longitude;
-        if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second && (counter%recording_image_frame ==0)){
-            image_counter1++;
-            std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
-            cv::imwrite(savingName1, imLeft);
 
-            //Add the time, range, rtk matrices, images to sync record topic
-            rover_sync_record.image_left = *msgLeft;
-            rover_sync_record.range_distance = -1;
+        //use time as storage parameter
+         if (use_time_difference){
+            if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second ){
+                //Add the time, range, rtk matrices, images to sync record topic
+                rover_sync_record.image_left = *msgLeft;
+                rover_sync_record.range_distance = -1;
+                rover_sync_record.header.stamp = msgLeft->header.stamp;
+                rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
+                rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
+                rover_sync_record.rtk_latitude = rtk_latitude;
+                rover_sync_record.rtk_longitude = rtk_longitude;
+                image_counter1++;
+
+                if (storage_mode){
+                //Write timestamp and range file and ground_truth files
+                    std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
+                    cv::imwrite(savingName1, imLeft);
+                    for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
+                        groundtruthlog << *i << " ";
+                    groundtruthlog <<""<<endl;
+                    for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
+                        groundtrutheulerlog << *i << " ";
+                    groundtrutheulerlog <<""<<endl;
+                    groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                    timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
+                    rangelog << std::to_string(-1)<<endl;
+                }
+            }
+
+            if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
+                image_counter2++;
+                if (storage_mode){
+                    std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
+                    cv::imwrite(savingName2, imRight);
+                }
+                rover_sync_record.image_right = *msgRight;
+            }
+         }
+         else{ //use frames as storage parameter
+                if(image_counter1%recording_image_frame ==0){
+                    image_counter1++;
+                    //Add the time, range, rtk matrices, images to sync record topic
+                    rover_sync_record.image_left = *msgLeft;
+                    rover_sync_record.range_distance = -1;
+                    rover_sync_record.header.stamp = msgLeft->header.stamp;
+                    rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
+                    rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
+                    rover_sync_record.rtk_latitude = rtk_latitude;
+                    rover_sync_record.rtk_longitude = rtk_longitude;
+
+                    if(storage_mode){
+                        std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
+                        cv::imwrite(savingName1, imLeft);
+                        //Write timestamp and range file and ground_truth files
+                        for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
+                            groundtruthlog << *i << " ";
+                        groundtruthlog <<""<<endl;
+                        for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
+                            groundtrutheulerlog << *i << " ";
+                        groundtrutheulerlog <<""<<endl;
+                        groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                        timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
+                        rangelog << std::to_string(-1)<<endl;
+                    }
+                }
+               if(image_counter2%recording_image_frame ==0){
+                    image_counter2++;
+                    if(storage_mode){
+                        std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
+                        cv::imwrite(savingName2, imRight);
+                    }
+                    rover_sync_record.image_right = *msgRight;
+               }
+          }
+  }
+    else { //got the ranging measurement
+
+        if (range_last_timestamp < Left_mean_timestamp){
+            //Add the time, range, rtk matrices to the publishers
+            rover_sync_data.header.stamp = last_img_header.stamp;
+            rover_sync_data.range_distance = stored_range;
+            rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
+            rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
+            rover_sync_data.rtk_latitude = rtk_latitude;
+            rover_sync_data.rtk_longitude = rtk_longitude;
+
+            rover_sync_record.header.stamp = last_img_header.stamp;
+            rover_sync_record.range_distance = stored_range;
+            rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
+            rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
+            rover_sync_record.rtk_latitude = rtk_latitude;
+            rover_sync_record.rtk_longitude = rtk_longitude;
+
+            // Add the images to sync_data topic
+            rover_sync_data.image_left = *msgLeft;
+            rover_sync_data.image_right = *msgRight;
+
+            if(storage_mode){
+            //Write timestamp and range file and ground_truth files
+                timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
+                rangelog << stored_range <<endl;
+                for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
+                    groundtruthlog << *i << " ";
+                groundtruthlog <<""<<endl;
+                for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
+                    groundtrutheulerlog << *i << " ";
+                groundtrutheulerlog <<""<<endl;
+                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+            }
+            //Add the images to sync_record topic
+            if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second){
+                image_counter1++;
+                std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
+                cv::imwrite(savingName1, imLeft);
+                rover_sync_record.image_left = *msgLeft;
+                }
+            if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
+                image_counter2++;
+                std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
+                cv::imwrite(savingName2, imRight);
+                rover_sync_record.image_right = *msgRight;
+                }
+          }
+
+        else { //take the new image as ranging time is closer to new image
+            //Add the time, range, rtk matrices to the publishers
+            rover_sync_data.header.stamp = msgLeft->header.stamp;
+            rover_sync_data.range_distance = stored_range;
+            rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
+            rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
+            rover_sync_data.rtk_latitude = rtk_latitude;
+            rover_sync_data.rtk_longitude =rtk_longitude;
             rover_sync_record.header.stamp = msgLeft->header.stamp;
+            rover_sync_record.range_distance = stored_range;
             rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_record.rtk_latitude = rtk_latitude;
             rover_sync_record.rtk_longitude =rtk_longitude;
 
-            //Write timestamp and range file and ground_truth files
-            for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
-                groundtruthlog << *i << " ";
-            groundtruthlog <<""<<endl;
-            for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
-                groundtrutheulerlog << *i << " ";
-            groundtrutheulerlog <<""<<endl;
-            groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
-            timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
-            rangelog << std::to_string(-1)<<endl;
-            }
-
-        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second && (counter%recording_image_frame ==0)){
+            // Add the images to sync_data topic
+            rover_sync_data.image_left = *msgLeft;
+            rover_sync_data.image_right = *msgRight;
+            rover_sync_record.image_left = *msgLeft;
+            rover_sync_record.image_right = *msgRight;
+            image_counter1++;
             image_counter2++;
-            std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
-            cv::imwrite(savingName2, imRight);
-            rover_sync_record.image_right = *msgRight;
+
+            if (storage_mode){
+                //Write timestamp and range file and ground_truth files
+                timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
+                rangelog << stored_range <<endl;
+                for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
+                    groundtruthlog << *i << " ";
+                groundtruthlog <<""<<endl;
+                for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
+                    groundtrutheulerlog << *i << " ";
+                groundtrutheulerlog <<""<<endl;
+                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
+                cv::imwrite(savingName1, imLeft);
+                std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
+                cv::imwrite(savingName2, imRight);
             }
-  }
-  else {
-    if (range_last_timestamp <= Left_mean_timestamp){
-        //Write timestamp and range file and ground_truth files
-        timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
-        rangelog << stored_range <<endl;
-        for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
-            groundtruthlog << *i << " ";
-        groundtruthlog <<""<<endl;
-        for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
-            groundtrutheulerlog << *i << " ";
-        groundtrutheulerlog <<""<<endl;
-        groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
-
-        //Add the time, range, rtk matrices to the publishers
-        rover_sync_data.header.stamp = last_img_header.stamp;
-	    rover_sync_data.range_distance = stored_range;
-        rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
-        rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
-        rover_sync_data.rtk_latitude = rtk_latitude;
-        rover_sync_data.rtk_longitude =rtk_longitude;
-        rover_sync_record.header.stamp = last_img_header.stamp;
-	    rover_sync_record.range_distance = stored_range;
-        rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
-        rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
-        rover_sync_record.rtk_latitude = rtk_latitude;
-        rover_sync_record.rtk_longitude =rtk_longitude;
-
-        // Add the images to sync_data topic
-        rover_sync_data.image_left = *msgLeft;
-        rover_sync_data.image_right = *msgRight;
-
-        //Add the images to sync_record topic
-        if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second){
-            image_counter1++;
-            std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
-            cv::imwrite(savingName1, imLeft);
-            rover_sync_record.image_left = *msgLeft;
-            }
-        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
-	        image_counter2++;
-            std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
-            cv::imwrite(savingName2, imRight);
-            rover_sync_record.image_right = *msgRight;
-	        }
+        }
+        hit_flag = false;
       }
-    else {
-        //Write timestamp and range file and ground_truth files
-        timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
-        rangelog << stored_range <<endl;
-        for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
-            groundtruthlog << *i << " ";
-        groundtruthlog <<""<<endl;
-        for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
-            groundtrutheulerlog << *i << " ";
-        groundtrutheulerlog <<""<<endl;
-        groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
-
-        //Add the time, range, rtk matrices to the publishers
-        rover_sync_data.header.stamp = msgLeft->header.stamp;
-        rover_sync_data.range_distance = stored_range;
-        rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
-        rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
-        rover_sync_data.rtk_latitude = rtk_latitude;
-        rover_sync_data.rtk_longitude =rtk_longitude;
-        rover_sync_record.header.stamp = msgLeft->header.stamp;
-        rover_sync_record.range_distance = stored_range;
-        rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
-        rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
-        rover_sync_record.rtk_latitude = rtk_latitude;
-        rover_sync_record.rtk_longitude =rtk_longitude;
-
-        // Add the images to sync_data topic
-        rover_sync_data.image_left = *msgLeft;
-        rover_sync_data.image_right = *msgRight;
-
-        //Add the images to sync_record topic
-	    if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second){
-            image_counter1++;
-            std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
-            cv::imwrite(savingName1, imLeft);
-            rover_sync_record.image_left = *msgLeft;
-            }
-        if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
-	        image_counter2++;
-            std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
-            cv::imwrite(savingName2, imRight);
-            rover_sync_record.image_right = *msgRight;
-	    }
-    }
-    hit_flag = false;
-  }
     last_img_header = msgLeft->header;
     Left_last_timestamp = Left_img_sec + Left_img_nsec/1e9;
     Right_last_timestamp = Right_img_sec + Right_img_nsec/1e9;
@@ -360,7 +405,8 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::param::get("~recording_image_frame", recording_image_frame);
   ros::param::get("~recording_image_second", recording_image_second);
-//  ros::param::get("~use_frequency", use_frequency);
+  ros::param::get("~use_recording_image_second", use_time_difference);
+  ros::param::get("~storage_mode", storage_mode);
   //Subscribe to camera
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);

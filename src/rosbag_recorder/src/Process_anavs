@@ -1,0 +1,129 @@
+from netcat import Netcat
+import struct
+import binascii
+import datetime
+import numpy as np
+import math
+import csv
+import anavs_parser
+import socket
+import select
+
+TCP_PORT=6001
+
+
+class AnavsRTKNode:
+    def __init__(self):
+        # ------------------------------------------------------------------------------
+        # init values
+        self.text_buffer = ' '
+        self.parser = anavs_parser.ANAVSParserUBX()
+        self.tcp_ip = '192.168.42.1'
+        #self.odometry_msg = Odometry()
+        #self.nav_msg = NavSatFix()
+        #self.gnss_time_msg = TimeReference()
+        #self.odom_local = Odometry()
+        #self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost")
+
+        # ------------------------------------------------------------------------------
+        # create publisher, subscriber and node handle
+        #self.pub_odometry = rospy.Publisher('rtk_odometry', Odometry, queue_size=10)
+        #self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
+        #self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
+        #rospy.init_node('anavs_rtk_node', anonymous=True)
+
+        # ------------------------------------------------------------------------------
+        # create connection
+        self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcp_socket.connect((self.tcp_ip, TCP_PORT))
+        self.tcp_socket.setblocking(0)
+        print "Connected to RTK processing module"
+
+        # ------------------------------------------------------------------------------
+        # main loop
+        #rate = rospy.Rate(100.)
+        #while not rospy.is_shutdown():
+        readable, writable, exceptional = select.select([self.tcp_socket], [], [self.tcp_socket], 1)
+        if self.tcp_socket in readable:
+            self.text_buffer += self.tcp_socket.recv(4096)
+            if self.parse_data_ubx():
+                if self.parser.code == 4 or self.parser.code == 5:
+                    abc=1
+                        #current_time = rospy.Time.now()
+                        #self.build_odometry_msg(current_time, self.parser.code)
+                        #self.build_nav_msg(current_time)
+                        #self.build_time(current_time)
+
+            #rate.sleep()
+
+    def parse_data_ubx(self):
+        header = chr(int('0xb5', 16)) + chr(int('0x62', 16)) + chr(int('0x02', 16)) + chr(int('0xe0', 16))
+
+        idx_start = self.text_buffer.find(header)
+
+        payload_length = 0
+        if len(self.text_buffer) > idx_start + 5:
+            payload_length = struct.unpack('H', self.text_buffer[idx_start + 4:idx_start + 6])[0]
+
+        if idx_start > 0 and len(self.text_buffer) >= idx_start + payload_length + 8:
+            self.text_buffer = self.text_buffer[idx_start:idx_start + payload_length + 8]
+            self.parser.parse(self.text_buffer)
+            self.text_buffer = ' '
+            print self.parser
+            return True
+        else:
+            return False
+
+
+if __name__ == '__main__':
+    try:
+        node = AnavsRTKNode()
+    except:
+        pass
+
+"""
+def calcValue(string):
+    try:
+        value = struct.unpack("d", struct.pack("q", int(string, 16)))[0]
+    except struct.error:
+        value ='n/a'
+    return value
+
+def binaryToFloat(value):
+    hx = hex(int(value, 2))
+    return struct.unpack("d", struct.pack("q", int(hx, 16)))[0]
+
+
+def weeksecondstoutc(gpsweek, gpsseconds, leapseconds):
+    datetimeformat = "%Y-%m-%d %H:%M:%S"
+    epoch = datetime.datetime.strptime("1980-01-06 00:00:00", datetimeformat)
+    elapsed = datetime.timedelta(days=(gpsweek * 7), seconds=(gpsseconds + leapseconds))
+    return datetime.datetime.strftime(epoch + elapsed, datetimeformat)
+
+
+#def decode2(string):
+#    print string
+
+if __name__ == "__main__":
+    # start a new Netcat() instance
+    # nc = Netcat('10.42.0.99', 6001) #ethernet
+    nc = Netcat('192.168.42.1', 6001)  # wifi
+    
+    #myFile = open('/home/aayushsingla/catkin_ws/src/rosbag_recoder/example.csv', 'w')
+    #data = [['Timestamp', 'North', 'East', 'Down', 'Heading_angle', 'Pitch_angle', 'Roll_angle']]
+    #with myFile:
+    #    writer = csv.writer(myFile)
+    #    writer.writerows(data)
+    
+    while True:
+        recv = nc.read()
+        recv = nc.read_until('b56202')
+        if not recv: break
+        # print recv  # for nmea
+        print '----------------------------------------'
+        b = bytearray(recv)
+        test = binascii.hexlify(b)
+        #print test
+        decodeUBX(test)  # for ubx
+    abc = 1  # finished
+"""

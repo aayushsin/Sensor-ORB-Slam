@@ -57,10 +57,10 @@ cd /*/catkin_ws/src/sensor_synchronizer/launch/, in synchronizer.launch
 ========
 Bag Files
 ========
-1) Change the path in argument of  <CATKIN_WS>/src/bag_images/launch/record.launch file.
-2) Change the path in argument of  <CATKIN_WS>/src/bag_images/launch/record_sync.launch file.
-3) roslaunch bag_images record.launch will record 4 topics : Camera_left, Camera_right, ranger_distance, rtk_odometry
-4) roslaunch bag_images record_sync.launch will record just 1 topics : /tum_nav/sync_data for synchronized data
+1) Change the path in argument of  <CATKIN_WS>/src/rosbag_recoder/launch/record.launch file.
+2) Change the path in argument of  <CATKIN_WS>/src/rosbag_recoder/launch/record_sync.launch file.
+3) roslaunch rosbag_recoder record.launch will record 4 topics : Camera_left, Camera_right, ranger_distance, rtk_odometry
+4) roslaunch rosbag_recoder record_sync.launch will record just 1 topics : /tum_nav/sync_data for synchronized data
 
 
 
