@@ -64,6 +64,9 @@ int recording_image_frame = 2;  //recording rate for dataset
 double recording_image_second = 0.040; // in seconds
 int counter = 0;
 bool use_frequency;
+bool saved_last= false;
+sensor_msgs::Image msgLastLeft;
+sensor_msgs::Image msgLastRight;
 
 class MatchGrabber{
 public:
@@ -156,6 +159,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 rover_sync_record.rtk_latitude = rtk_latitude;
                 rover_sync_record.rtk_longitude = rtk_longitude;
                 image_counter1++;
+                saved_last = true;
 
                 if (storage_mode){
                 //Write timestamp and range file and ground_truth files
@@ -193,6 +197,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                     rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
                     rover_sync_record.rtk_latitude = rtk_latitude;
                     rover_sync_record.rtk_longitude = rtk_longitude;
+                    saved_last = true;
 
                     if(storage_mode){
                         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
@@ -220,17 +225,15 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
           }
   }
     else { //got the ranging measurement
-
         if (range_last_timestamp < Left_mean_timestamp){
             //Add the time, range, rtk matrices to the publishers
-            rover_sync_data.header.stamp = last_img_header.stamp;
+            rover_sync_data.header.stamp = msgLeft->header.stamp;
             rover_sync_data.range_distance = stored_range;
             rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_data.rtk_latitude = rtk_latitude;
             rover_sync_data.rtk_longitude = rtk_longitude;
 
-            rover_sync_record.header.stamp = last_img_header.stamp;
             rover_sync_record.range_distance = stored_range;
             rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
@@ -258,14 +261,25 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 image_counter1++;
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
                 cv::imwrite(savingName1, imLeft);
-                rover_sync_record.image_left = *msgLeft;
+                if (saved_last){
+                    rover_sync_record.header.stamp = msgLeft->header.stamp;
+                    rover_sync_record.image_left = *msgLeft;
+                }else{
+                    rover_sync_record.header.stamp = last_img_header.stamp;
+                    rover_sync_record.image_left = msgLastLeft;
+                    }
                 }
             if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
                 image_counter2++;
                 std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
                 cv::imwrite(savingName2, imRight);
-                rover_sync_record.image_right = *msgRight;
+                if (saved_last){
+                    rover_sync_record.image_right = *msgRight;
+                }else{
+                    rover_sync_record.image_left = msgLastRight;
+                    }
                 }
+            saved_last =false;
           }
 
         else { //take the new image as ranging time is closer to new image
@@ -315,6 +329,8 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
     Right_last_timestamp = Right_img_sec + Right_img_nsec/1e9;
     rover_sync_data_pub.publish(rover_sync_data);
     rover_sync_record_pub.publish(rover_sync_record);
+    msgLastLeft = *msgLeft;
+    msgLastRight = *msgRight;
 }
 
 void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message){
