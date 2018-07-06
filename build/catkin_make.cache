@@ -1,2 +1,0 @@
-anavs_rtk_dlr:camera1394:camera1394stereo:decawave_driver:rosbag_recorder:sensor_synchronizer:snowmower_msgs:ueye_cam
--DCATKIN_DEVEL_PREFIX=/home/yhlee/Sensor_Sync/devel -DCMAKE_INSTALL_PREFIX=/home/yhlee/Sensor_Sync/install -G Unix Makefiles

@@ -1,8 +1,0 @@
-prefix=/home/yhlee/Sensor_Sync/install
-
-Name: rosbag_recoder
-Description: Description of rosbag_recoder
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/yhlee/Sensor_Sync/install/lib 
-Requires: 

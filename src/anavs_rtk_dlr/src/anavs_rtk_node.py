@@ -35,8 +35,8 @@ class AnavsRTKNode:
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
         # self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav
-        self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.42.1")  # dlr-kn (pw: #LocoExplo#)
-        # self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.42.1")  # dlr-kn (pw: #LocoExplo#)
+        self.tcp_ip = rospy.get_param('/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
 
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
@@ -98,8 +98,8 @@ class AnavsRTKNode:
         euler_angles = np.array(
             [[self.parser.bank * np.pi / 180, self.parser.elevation * np.pi / 180, self.parser.heading * np.pi / 180]])
 
-        rotation_matrix = self.build_r1(self.parser.bank * np.pi / 180) * self.build_r2(
-            self.parser.elevation * np.pi / 180) * self.build_r3(self.parser.heading * np.pi / 180)
+	# Rotation sequence from B to MSM: 321 => rotation_matrix: rotm_msm2base
+	rotation_matrix = self.build_r3(self.parser.heading * np.pi / 180) * self.build_r2(self.parser.elevation * np.pi / 180) * self.build_r1(self.parser.bank * np.pi / 180) 
         rotation_matrix = np.asarray(rotation_matrix)
 
         self.rtk_groundtruth.header.stamp = current_time

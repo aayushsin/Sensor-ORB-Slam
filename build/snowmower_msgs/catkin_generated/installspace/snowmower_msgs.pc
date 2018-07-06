@@ -1,8 +1,0 @@
-prefix=/home/yhlee/Sensor_Sync/install
-
-Name: snowmower_msgs
-Description: Description of snowmower_msgs
-Version: 0.0.1
-Cflags: -I/home/yhlee/Sensor_Sync/install/include
-Libs: -L/home/yhlee/Sensor_Sync/install/lib 
-Requires: message_runtime

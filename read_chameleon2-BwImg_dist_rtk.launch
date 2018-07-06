@@ -78,6 +78,24 @@
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="reconfigure_gui" output="screen"/>
 
     
+    <!-- get Anchor angle, Tag angle, and Distance from command line -->
+    <arg name="a" default="0"/>
+    <arg name="t" default="0"/>
+    <arg name="d" default="0"/>
+    <!-- Launch the DecaWave Driver node for T0 -->
+    <node pkg="decawave_driver" type="dist_reader.py" name="dist_reader" output="screen">
+        <param name="port" value="/dev/ttyACM0" type="string"/>
+        <param name="baud" value="115200" type="int"/>
+        <param name="id" value="a0" type="string"/>
+        <param name="anchor_angle" type="double" value="$(arg a)"/>
+        <param name="tag_angle" type="double" value="$(arg t)"/>
+        <param name="beacon_distance" type="double" value="$(arg d)"/>
+    </node>   
+    
+    
+    <node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen">
+        <param name="rtk_module_ip" value="192.168.20.13"/>
+    </node>
 
 
 </launch>

@@ -1,8 +1,0 @@
-prefix=/home/yhlee/Sensor_Sync/install
-
-Name: ueye_cam
-Description: Description of ueye_cam
-Version: 1.0.16
-Cflags: -I/home/yhlee/Sensor_Sync/install/include
-Libs: -L/home/yhlee/Sensor_Sync/install/lib -lueye_wrapper -lueye_cam_nodelet
-Requires: roscpp nodelet dynamic_reconfigure image_transport sensor_msgs camera_calibration_parsers camera_info_manager
