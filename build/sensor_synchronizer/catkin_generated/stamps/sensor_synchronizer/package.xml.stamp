@@ -1,0 +1,43 @@
+<package>
+  <name>sensor_synchronizer</name>
+  <version>1.0.0</version>
+  <description>This is a modified version of the ROS driver for devices supporting the IEEE 
+    1394 Digital Camera (IIDC) protocol in package camera1394. 
+    It adds support for reading from stereo pairs.</description>
+  <maintainer email="miquel.massot@uib.es">alexander.kang</maintainer>
+  <license>LGPL</license>
+  <url type="bugtracker">https://github.com/srv/camera1394stereo/issues</url> 
+
+  <author>Joan Pau Beltran</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>camera_info_manager</build_depend>
+  <build_depend>image_transport</build_depend> 
+  <build_depend>tf</build_depend>
+  <build_depend>opencv2</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>snowmower_msgs</build_depend>
+  <build_depend>anavs_rtk_dlr</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+
+
+
+  <run_depend>camera_info_manager</run_depend> 
+  <run_depend>image_transport</run_depend> 
+  <run_depend>tf</run_depend> 
+  <run_depend>opencv2</run_depend>
+  <run_depend>cv_bridge</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>snowmower_msgs</run_depend>
+  <run_depend>anavs_rtk_dlr</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
+
+</package>

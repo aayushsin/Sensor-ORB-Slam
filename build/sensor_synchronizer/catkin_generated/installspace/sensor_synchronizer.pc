@@ -1,0 +1,8 @@
+prefix=/home/yhlee/Sensor_Sync/install
+
+Name: sensor_synchronizer
+Description: Description of sensor_synchronizer
+Version: 1.0.0
+Cflags: -I/home/yhlee/Sensor_Sync/install/include
+Libs: -L/home/yhlee/Sensor_Sync/install/lib 
+Requires: rospy std_msgs sensor_msgs message_runtime

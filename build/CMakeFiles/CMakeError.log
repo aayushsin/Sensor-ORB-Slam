@@ -1,0 +1,53 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec2176013825/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec2176013825.dir/build.make CMakeFiles/cmTryCompileExec2176013825.dir/build
+make[1]: Entering directory `/home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec2176013825.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec2176013825.dir/CheckSymbolExists.c.o   -c /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTryCompileExec2176013825
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2176013825.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec2176013825.dir/CheckSymbolExists.c.o  -o cmTryCompileExec2176013825 -rdynamic 
+CMakeFiles/cmTryCompileExec2176013825.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec2176013825] Error 1
+make[1]: Leaving directory `/home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec2176013825/fast] Error 2
+
+File /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/make "cmTryCompileExec1955749323/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec1955749323.dir/build.make CMakeFiles/cmTryCompileExec1955749323.dir/build
+make[1]: Entering directory `/home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec1955749323.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTryCompileExec1955749323.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec1955749323
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1955749323.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTryCompileExec1955749323.dir/CheckFunctionExists.c.o  -o cmTryCompileExec1955749323 -rdynamic -lpthreads 
+/usr/bin/x86_64-linux-gnu-ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+make[1]: *** [cmTryCompileExec1955749323] Error 1
+make[1]: Leaving directory `/home/yhlee/Sensor_Sync/build/CMakeFiles/CMakeTmp'
+make: *** [cmTryCompileExec1955749323/fast] Error 2
+
+

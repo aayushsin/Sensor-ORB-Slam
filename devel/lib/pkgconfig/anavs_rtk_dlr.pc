@@ -1,0 +1,8 @@
+prefix=/home/yhlee/Sensor_Sync/devel
+
+Name: anavs_rtk_dlr
+Description: Description of anavs_rtk_dlr
+Version: 0.0.1
+Cflags: -I/home/yhlee/Sensor_Sync/devel/include
+Libs: -L/home/yhlee/Sensor_Sync/devel/lib 
+Requires: rospy std_msgs message_runtime

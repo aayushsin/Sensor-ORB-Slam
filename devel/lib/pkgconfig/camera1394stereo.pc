@@ -1,0 +1,8 @@
+prefix=/home/yhlee/Sensor_Sync/devel
+
+Name: camera1394stereo
+Description: Description of camera1394stereo
+Version: 1.0.5
+Cflags: -I/home/yhlee/Sensor_Sync/devel/include
+Libs: -L/home/yhlee/Sensor_Sync/devel/lib -lcamera1394stereo
+Requires: 

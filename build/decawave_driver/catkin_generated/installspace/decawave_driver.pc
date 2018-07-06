@@ -1,0 +1,8 @@
+prefix=/home/yhlee/Sensor_Sync/install
+
+Name: decawave_driver
+Description: Description of decawave_driver
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/yhlee/Sensor_Sync/install/lib 
+Requires: 
