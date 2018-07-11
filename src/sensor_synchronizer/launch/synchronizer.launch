@@ -4,6 +4,7 @@
         <param name="recording_image_frame" value="2" type="int"/>
         <param name="use_recording_image_second" value="true" type="bool"/>
         <param name="storage_mode" value="false" type="bool" />
+        <param name="folderpath" value=""/>
         <!--<param name="direct" command="$(find filter_synchronizer1)/create_directory.sh"/>-->
     </node>
 

@@ -51,7 +51,7 @@ class ImageCreator():
 
 
 
-                if topic == "/camera/left/image_raw/compressed":
+                if topic == "/camera/left/image_raw/":
                     try:
                         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
                     except CvBridgeError, e:

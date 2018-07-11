@@ -29,7 +29,7 @@ string path = ros::package::getPath("sensor_synchronizer");
 string wk_path = path.substr(0,path.find("/src/"));
 string Image_path1;
 string Image_path2;
-string cali_filename = path + "/src/bumblebee2.yaml";
+string cali_filename = path + "/src/EuRoC.yaml";
 string range_file;
 string timestamp_file;
 string groundtruth_file;
@@ -244,6 +244,20 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             rover_sync_data.image_left = *msgLeft;
             rover_sync_data.image_right = *msgRight;
 
+            image_counter1++;
+            image_counter2++;
+
+            //Add the images to sync_record topic
+            if (saved_last){
+                rover_sync_record.header.stamp = msgLeft->header.stamp;
+                rover_sync_record.image_left = *msgLeft;
+                rover_sync_record.image_right = *msgRight;
+            }else{
+                rover_sync_record.header.stamp = last_img_header.stamp;
+                rover_sync_record.image_left = msgLastLeft;
+                rover_sync_record.image_left = msgLastRight;
+                }
+
             if(storage_mode){
             //Write timestamp and range file and ground_truth files
                 timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
@@ -255,33 +269,14 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                     groundtrutheulerlog << *i << " ";
                 groundtrutheulerlog <<""<<endl;
                 groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
-            }
-            //Add the images to sync_record topic
-            if(Left_img_sec + Left_img_nsec/1e9-Left_last_timestamp > recording_image_second){
-                image_counter1++;
+
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
                 cv::imwrite(savingName1, imLeft);
-                if (saved_last){
-                    rover_sync_record.header.stamp = msgLeft->header.stamp;
-                    rover_sync_record.image_left = *msgLeft;
-                }else{
-                    rover_sync_record.header.stamp = last_img_header.stamp;
-                    rover_sync_record.image_left = msgLastLeft;
-                    }
-                }
-            if(Right_img_sec + Right_img_nsec/1e9-Right_last_timestamp > recording_image_second){
-                image_counter2++;
                 std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
                 cv::imwrite(savingName2, imRight);
-                if (saved_last){
-                    rover_sync_record.image_right = *msgRight;
-                }else{
-                    rover_sync_record.image_left = msgLastRight;
-                    }
-                }
+            }
             saved_last =false;
           }
-
         else { //take the new image as ranging time is closer to new image
             //Add the time, range, rtk matrices to the publishers
             rover_sync_data.header.stamp = msgLeft->header.stamp;
@@ -321,6 +316,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
                 cv::imwrite(savingName2, imRight);
             }
+            saved_last = false;
         }
         hit_flag = false;
       }
@@ -359,19 +355,20 @@ int main(int argc, char** argv)
   //replace(current_iso_time.begin(), current_iso_time.end(), ':', '');
   current_iso_time.erase(std::remove(current_iso_time.begin(), current_iso_time.end(), ':'), current_iso_time.end());
   std::string foldername = "storage_" + current_iso_time;
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername);
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername +"/distance_data");
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername + "/ground_truth");
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+ "/left_image_data");
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+"/right_image_data");
-  boost::filesystem::create_directories(wk_path+"/storage/"+foldername+"/time_stamp");
-  Image_path1 = wk_path + "/storage/"+ foldername + "/left_image_data/";
-  Image_path2 = wk_path + "/storage/"+ foldername + "/right_image_data/";
-  range_file = wk_path + "/storage/"+ foldername + "/distance_data/range.txt";
-  timestamp_file = wk_path + "/storage/"+ foldername + "/time_stamp/time_stamp.txt";
-  groundtruth_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth.txt";
-  groundtrutheuler_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth_euler.txt";
-  groundtruthcoordinates_file = wk_path + "/storage/"+ foldername + "/ground_truth/ground_truth_coordinates.txt";
+  std::string folderpath = wk_path + "/storage/" + foldername;
+  boost::filesystem::create_directories(folderpath);
+  boost::filesystem::create_directories(folderpath +"/distance_data");
+  boost::filesystem::create_directories(folderpath + "/ground_truth");
+  boost::filesystem::create_directories(folderpath+ "/left_image_data");
+  boost::filesystem::create_directories(folderpath+"/right_image_data");
+  boost::filesystem::create_directories(folderpath+"/time_stamp");
+  Image_path1 = folderpath + "/left_image_data/";
+  Image_path2 = folderpath + "/right_image_data/";
+  range_file = folderpath + "/distance_data/range.txt";
+  timestamp_file = folderpath + "/time_stamp/time_stamp.txt";
+  groundtruth_file = folderpath + "/ground_truth/ground_truth.txt";
+  groundtrutheuler_file = folderpath + "/ground_truth/ground_truth_euler.txt";
+  groundtruthcoordinates_file = folderpath + "/ground_truth/ground_truth_coordinates.txt";
 
   rangelog.open (range_file,ios::out | ios::trunc);  //  ios::app,   ios::ate ,other modes
   timestamplog.open (timestamp_file,ios::out | ios::trunc);
@@ -390,18 +387,23 @@ int main(int argc, char** argv)
     return -1;
   }
 
-  cv::Mat K_l, K_r, P_l, P_r, R_l, R_r, D_l, D_r;
+  cv::Mat K_l, K_r, P_l, P_r, R_l, R_r, D_l, D_r,P_l2,P_l3,R1,R2,P1,P2,Q,P_r2,T_lw,T_rw;
+
   fsSettings["LEFT.K"] >> K_l;
   fsSettings["RIGHT.K"] >> K_r;
 
   fsSettings["LEFT.P"] >> P_l;
   fsSettings["RIGHT.P"] >> P_r;
 
+  fsSettings["LEFT.T_lw"] >> T_lw;
+  fsSettings["RIGHT.T_rw"] >> T_rw;
+
   fsSettings["LEFT.R"] >> R_l;
   fsSettings["RIGHT.R"] >> R_r;
 
   fsSettings["LEFT.D"] >> D_l;
   fsSettings["RIGHT.D"] >> D_r;
+  float b_f = fsSettings["Camera.bf"];
 
   int rows_l = fsSettings["LEFT.height"];
   int cols_l = fsSettings["LEFT.width"];
@@ -415,6 +417,36 @@ int main(int argc, char** argv)
     return -1;
   }
 
+/*  cout << K_l <<endl;
+  P_l2 = cv::getOptimalNewCameraMatrix(K_l,D_l,cv::Size(cols_l,rows_l),1,cv::Size(cols_l,rows_l));
+  P_r2 = cv::getOptimalNewCameraMatrix(K_r,D_r,cv::Size(cols_l,rows_l),1,cv::Size(cols_l,rows_l));
+  cout << P_l2 << endl;
+    P_l3 = cv::getOptimalNewCameraMatrix(K_l,D_l,cv::Size(cols_l,rows_l),0.5,cv::Size(cols_l,rows_l));
+  cout << P_l3 << endl;
+  cout << P_r << endl;
+
+
+  cv::Mat R_lw =  T_lw.rowRange(0,3).colRange(0,3);
+  cv::Mat R_rw =  T_rw.rowRange(0,3).colRange(0,3);
+  cv::Mat R = R_rw*R_lw.t();
+  //cv::Mat R = cv::Mat::eye(3,3,CV_64F);
+
+  cv::Mat T = R_lw.t()*T_rw.rowRange(0,3).col(3) - R_rw.t()*T_lw.rowRange(0,3).col(3);
+  //cv::Mat T = cv::Mat::zeros(3,1,CV_64F);
+  cout << T << endl;
+
+
+  cv::stereoRectify(K_l,D_l,K_r,D_r,cv::Size(cols_l,rows_l),R, -T,R1,R2,P1,P2,Q);
+  //cv::stereoRectify(P_l2,D_l,P_r2,D_r,cv::Size(cols_l,rows_l),R,T,R1,R2,P1,P2,Q,CV_CALIB_ZERO_DISPARITY,1,cv::Size(cols_l,rows_l));
+  cout << b_f << endl;
+  cout << "R1" <<endl;
+  cout << R1 << endl;
+  cout << "R2" <<endl;
+  cout << R2 << endl;
+  cout << "P1" <<endl;
+  cout << P1 << endl;
+  cout << "P2" <<endl;
+  cout << P2 << endl;*/
   cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,igb.M1l,igb.M2l);
   cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,igb.M1r,igb.M2r);
 
@@ -423,6 +455,7 @@ int main(int argc, char** argv)
   ros::param::get("~recording_image_second", recording_image_second);
   ros::param::get("~use_recording_image_second", use_time_difference);
   ros::param::get("~storage_mode", storage_mode);
+  ros::param::set("~folderpath", folderpath+"/subset");
   //Subscribe to camera
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
