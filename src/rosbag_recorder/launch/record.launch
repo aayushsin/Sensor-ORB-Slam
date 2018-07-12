@@ -1,5 +1,6 @@
-
 <launch>
-    <arg name="folderpath" value="/synchronizer/folderpath" />
-    <node pkg="rosbag" type="record" name="record" output="screen" args="-O $(arg folderpath) /camera/left/image_raw /camera/right/image_raw /ranger_finder/data /rtk_odometry"/>
+<!--    <rosparam command="load" file="$(find sensor_synchronizer)/temporary.yaml"/>
+     <arg name="folderpath" value="/folderpath" />
+    <node pkg="rosbag" type="record" name="record" output="screen" args="-O $(arg /folderpath) /camera/left/image_raw /camera/right/image_raw /ranger_finder/data /rtk_odometry"/>-->
+    <node pkg="rosbag" type="record" name="record" output="screen" args="-O /home/yhlee/Sensor_Sync/storage/subset /camera/left/image_raw /camera/right/image_raw /ranger_finder/data /rtk_odometry"/>
 </launch>

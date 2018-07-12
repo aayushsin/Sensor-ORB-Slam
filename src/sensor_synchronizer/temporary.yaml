@@ -1,0 +1,12 @@
+folderpath: /home/aayushsingla/catkin_ws/storage/storage_2018-07-12_113855/subset
+rosdistro: 'indigo
+
+  '
+roslaunch:
+  uris: {host_nav_w540__50291: 'http://NAV-W540:50291/'}
+rosversion: '1.11.21
+
+  '
+run_id: 2811f1ec-85c8-11e8-829e-e8b1fc4ec2ad
+synchronizer: {folderpath: '', recording_image_frame: 2, recording_image_second: 0.001,
+  storage_mode: false, use_recording_image_second: true}

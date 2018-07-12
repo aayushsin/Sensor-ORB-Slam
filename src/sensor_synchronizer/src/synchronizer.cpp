@@ -378,7 +378,6 @@ int main(int argc, char** argv)
   groundtruthcoordinateslog << "Latitude   Longitude" << endl;
   MatchGrabber igb;
 
-  //cv::FileStorage fsSettings(string(argv[1]), cv::FileStorage::READ);
   cv::FileStorage fsSettings(cali_filename, cv::FileStorage::READ);
 
   if(!fsSettings.isOpened())
@@ -455,7 +454,9 @@ int main(int argc, char** argv)
   ros::param::get("~recording_image_second", recording_image_second);
   ros::param::get("~use_recording_image_second", use_time_difference);
   ros::param::get("~storage_mode", storage_mode);
-  ros::param::set("~folderpath", folderpath+"/subset");
+  ros::param::set("folderpath", folderpath+"/subset");
+  std::string command = " echo 'ROS Params dumped' ; rosparam dump " + path +"/temporary.yaml";
+  system(command.c_str());
   //Subscribe to camera
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
