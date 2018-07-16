@@ -63,7 +63,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
 
     bool displayCorners = false ;//true;
     const int maxScale = 2;
-    const float squareSize = 2.5;  // Set this to your actual square size
+    const float squareSize = 0.0245;  // Set this to your actual square size
     // ARRAY AND VECTOR STORAGE:
 
     vector<vector<Point2f> > imagePoints[2];
@@ -71,11 +71,12 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     Size imageSize;
 
     int i, j, k, nimages = (int)imagelist.size()/2;
+    cout << "IMG lst size:" << nimages<< endl;
+    //cout << "IMG lst " << imagelist << endl;
 
     imagePoints[0].resize(nimages);
     imagePoints[1].resize(nimages);
     vector<string> goodImageList;
-
     for( i = j = 0; i < nimages; i++ )
     {
         for( k = 0; k < 2; k++ )
@@ -83,12 +84,13 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
             const string& filename = imagelist[i*2+k];
             //filename = "/home/aayushsingla/stereo-calibration/Cal2/" + filename;
             cout << filename << endl;
+
             Mat img = imread(filename, 0);
             if(img.empty())
                 break;
             if( imageSize == Size() ){
                 imageSize = img.size();
-                cout <<imageSize<<endl;
+                //cout <<imageSize<<endl;
                 }
             else if( img.size() != imageSize )
             {
@@ -113,6 +115,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                         Mat cornersMat(corners);
                         cornersMat *= 1./scale;
                     }
+
                     break;
                 }
             }

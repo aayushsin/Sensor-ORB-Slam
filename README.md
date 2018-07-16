@@ -20,13 +20,11 @@ Compile
 Set-Up
 ========
 7. source devel/setup.bash
-8. sudo chmod 666 /dev/ttyACM*: the enumeration should be the same as it is displayed.
-check accordingly the port number in the launch file <param name="port" value="/dev/ttyACM0" type="string"/> in catkin_ws/src/read_dw_camera_dist.launch 
-or
-self.dwPort = rospy.get_param('~port','dev/ttyACM0') in catkin_ws/src/decawave_driver/src/dist_read.py
+8. sudo chmod 666 /dev/ttyACM*: the enumeration should be the same as it is displayed. Normally, it should be "/dev/ttyACM0"
+	If not, modify: catkin_ws/src/read_dw_camera_dist.launch and catkin_ws/src/decawave_driver/src/dist_read.py with right enumeration
 9. Run the ANavsWizard for UBX solution after connecting to wifi SSID: ANavs_RTK_Server and wait for 2-3 mins to get the correct precision data
 10. Change the IP of your ANavs_PI in src/anavs_rtk_dlr/src/anavs_rtk_node.py in variable self.tcp_ip
-11. The bayer pattern in <CATKIN_WS>/read_dw_camera_dist.launch refers to the type of image displayed and recoreded. "grbg" refers to colorful while "" to monochrome image.
+11. The bayer pattern in <CATKIN_WS>/read_*_dist.launch refers to the type of image displayed and recoreded. "grbg" refers to colorful while "" to monochrome image.
 12. Terminal1: roslaunch read_colorImg_dw_camera_dist.launch for rbg image or read_bwImg_dw_camera_dist.launch for monochrome image
 13. roslaunch sensor_synchronizer synchronizer.launch
 
