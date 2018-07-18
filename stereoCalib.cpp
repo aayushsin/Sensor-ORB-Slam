@@ -46,7 +46,7 @@ static int print_help()
             "         matrix separately) stereo. \n"
             " Calibrate the cameras and display the\n"
             " rectified results along with the computed disparity images.   \n" << endl;
-    cout << "Usage:\n ./stereo_calib -w board_width -h board_height [-nr /*dot not view results*/] <image list XML/YML file>\n" << endl;
+    cout << "Usage:\n ./stereo_calib -w board_width -h board_height [-nr /*do not view results*/] <image list XML/YML file>\n" << endl;
     return 0;
 }
 
@@ -62,7 +62,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     }
 
     bool displayCorners = false ;//true;
-    const int maxScale = 2;
+    const int maxScale = 1;
     const float squareSize = 0.0245;  // Set this to your actual square size
     // ARRAY AND VECTOR STORAGE:
 
@@ -219,11 +219,11 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     cout << "average reprojection err = " <<  err/npoints << endl;
 
     // save intrinsic parameters
-    FileStorage fs("intrinsics.yml", CV_STORAGE_WRITE);
+    FileStorage fs(nimages+"intrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
-        fs << "M1" << cameraMatrix[0] << "D1" << distCoeffs[0] <<
-            "M2" << cameraMatrix[1] << "D2" << distCoeffs[1];
+        fs << "K1" << cameraMatrix[0] << "D1" << distCoeffs[0] <<
+            "K2" << cameraMatrix[1] << "D2" << distCoeffs[1];
         fs.release();
     }
     else
@@ -237,7 +237,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                   imageSize, R, T, R1, R2, P1, P2, Q,
                   CALIB_ZERO_DISPARITY, 1, imageSize, &validRoi[0], &validRoi[1]);
 
-    fs.open("extrinsics.yml", CV_STORAGE_WRITE);
+    fs.open(nimages+"extrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "R" << R << "T" << T << "R1" << R1 << "R2" << R2 << "P1" << P1 << "P2" << P2 << "Q" << Q;
