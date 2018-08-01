@@ -40,10 +40,10 @@ class AnavsRTKNode:
         
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
-        self.pub_odometry = rospy.Publisher('rtk_odometry', odom, queue_size=10)
-        self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
-        self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
-        rospy.init_node('anavs_rtk_node', anonymous=True)
+        self.pub_odometry = rospy.Publisher('rtk_odometry_static', odom, queue_size=10)
+        self.pub_nav = rospy.Publisher('gnss_nav_static', NavSatFix, queue_size=10)
+        self.pub_time = rospy.Publisher('gnss_time_static', TimeReference, queue_size=10)
+        rospy.init_node('anavs_rtk_static_node', anonymous=True)
 
         # ------------------------------------------------------------------------------
         # create connection
