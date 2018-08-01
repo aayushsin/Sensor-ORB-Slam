@@ -34,10 +34,11 @@ class AnavsRTKNode:
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
-        self.tcp_ip = rospy.get_param('/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
-        # self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav
-        #self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
-        #self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
+        self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip')
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
+        # self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.53") # tum-nav
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
         
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
@@ -51,7 +52,7 @@ class AnavsRTKNode:
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.tcp_socket.connect((self.tcp_ip, TCP_PORT))
         self.tcp_socket.setblocking(0)
-        print "Connected to RTK processing module"
+        print "Connected to RTK processing module %s:%d" % (self.tcp_ip, TCP_PORT)
 
         # ------------------------------------------------------------------------------
         # main loop

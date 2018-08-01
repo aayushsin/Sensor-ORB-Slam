@@ -32,10 +32,15 @@ class DLRRangingNode:
         self.ranging_msg = ranging_msg()
         self.ranging_all_msg = ranging_msg()
         self.ranging_cut_msg = ranging_msg()
-        #self.tcp_ip =  rospy.get_param('dlr_ranging_node/dlr_ranging_module_ip', "192.168.20.12") # Columbus
-        #self.tcp_ip =  rospy.get_param('dlr_ranging_node/dlr_ranging_module_ip', "192.168.20.42") # Drake
-        self.tcp_ip =  rospy.get_param('dlr_ranging_node/dlr_ranging_module_ip', "localhost") # dummy_receiver (Log_Ranging.txt)
-
+        #self.tcp_ip =  rospy.get_param('/dlr_ranging_node/dlr_ranging_module_ip', "192.168.20.12") # Columbus
+        #self.tcp_ip =  rospy.get_param('/dlr_ranging_node/dlr_ranging_module_ip', "192.168.20.42") # Drake
+        self.tcp_ip =  rospy.get_param('/dlr_ranging_node/dlr_ranging_module_ip', "localhost") # dummy_receiver (Log_Ranging.txt)
+        
+        self.dRoverID = rospy.get_param('/dlr_ranging_node/dRoverID')
+        self.sRoverID = rospy.get_param('/dlr_ranging_node/sRoverID')
+        
+        print 'dRoverID: ', self.dRoverID
+        print 'sRoverID: ', self.sRoverID
 
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
@@ -72,8 +77,8 @@ class DLRRangingNode:
                         current_time = rospy.Time.now()
                         self.build_ranging_all_msg(current_time)
                         
-                        if (self.parser.selfID == 11) and (self.parser.neigID == 14):
-                            print 'Distance estimate between Columbus(11) and Drake(14) is found'
+                        if (self.parser.selfID == self.dRoverID) and (self.parser.neigID == self.sRoverID):
+                            print 'Distance estimate between the dynamics and static rover is found'
                             self.build_ranging_cut_msg(current_time)
                     
             rate.sleep()
