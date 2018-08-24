@@ -34,18 +34,18 @@ class AnavsRTKNode:
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
-        self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip')
-        #self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
-        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.53?") # tum-nav (pw:?)
-        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
-        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
+        self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip')
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
+        # self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.53") # tum-nav
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
         
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
-        self.pub_odometry = rospy.Publisher('rtk_odometry', odom, queue_size=10)
-        self.pub_nav = rospy.Publisher('gnss_nav', NavSatFix, queue_size=10)
-        self.pub_time = rospy.Publisher('gnss_time', TimeReference, queue_size=10)
-        rospy.init_node('anavs_rtk_node', anonymous=True)
+        self.pub_odometry = rospy.Publisher('rtk_odometry_static', odom, queue_size=10)
+        self.pub_nav = rospy.Publisher('gnss_nav_static', NavSatFix, queue_size=10)
+        self.pub_time = rospy.Publisher('gnss_time_static', TimeReference, queue_size=10)
+        rospy.init_node('anavs_rtk_static_node', anonymous=True)
 
         # ------------------------------------------------------------------------------
         # create connection

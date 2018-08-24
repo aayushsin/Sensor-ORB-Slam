@@ -1,0 +1,7 @@
+<launch>
+    <arg name="folderpath" value="/folderpath" />
+    <node pkg="dlr_ranging" type="dlr_ranging_node.py" name="dlr_ranging_node" output="screen">
+        <param name="dRoverID" value="11"/>
+        <param name="sRoverID" value="14"/>
+    </node>
+</launch>
