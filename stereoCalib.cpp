@@ -181,7 +181,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                     CV_CALIB_FIX_ASPECT_RATIO +
                     CV_CALIB_ZERO_TANGENT_DIST +
                     CV_CALIB_SAME_FOCAL_LENGTH +
-                    CV_CALIB_RATIONAL_MODEL +
+                    //CV_CALIB_RATIONAL_MODEL +  // To calculate 8 parameters
                     CV_CALIB_FIX_K3 + CV_CALIB_FIX_K4 + CV_CALIB_FIX_K5);
     cout << "done with RMS error=" << rms << endl;
 
@@ -219,7 +219,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     cout << "average reprojection err = " <<  err/npoints << endl;
 
     // save intrinsic parameters
-    FileStorage fs(nimages+"intrinsics.yml", CV_STORAGE_WRITE);
+    FileStorage fs("85_intrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "K1" << cameraMatrix[0] << "D1" << distCoeffs[0] <<
@@ -237,7 +237,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                   imageSize, R, T, R1, R2, P1, P2, Q,
                   CALIB_ZERO_DISPARITY, 1, imageSize, &validRoi[0], &validRoi[1]);
 
-    fs.open(nimages+"extrinsics.yml", CV_STORAGE_WRITE);
+    fs.open("85_extrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "R" << R << "T" << T << "R1" << R1 << "R2" << R2 << "P1" << P1 << "P2" << P2 << "Q" << Q;

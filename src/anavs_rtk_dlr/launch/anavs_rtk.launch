@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="anavs_rtk_dlr" type="anavs_rtk_static_node.py" name="anavs_rtk_static_node" output="screen">
+        <param name="rtk_module_ip" value="192.168.42.1"/>
+        <!--<param name="rtk_module_ip" value="192.168.20.63"/>-->
+    </node>
+</launch>

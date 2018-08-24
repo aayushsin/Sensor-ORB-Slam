@@ -1,12 +1,41 @@
-folderpath: /home/aayushsingla/catkin_ws/storage/storage_2018-07-12_113855/subset
+anavs_rtk_node: {rtk_module_ip: 192.168.20.13}
+camera:
+  left:
+    image_raw:
+      compressed: {format: jpeg, jpeg_quality: 80, png_level: 9}
+      compressedDepth: {depth_max: 10.0, depth_quantization: 100.0, png_level: 9}
+      theora: {keyframe_frequency: 64, optimize_for: 1, quality: 31, target_bitrate: 800000}
+  right:
+    image_raw:
+      compressed: {format: jpeg, jpeg_quality: 80, png_level: 9}
+      compressedDepth: {depth_max: 10.0, depth_quantization: 100.0, png_level: 9}
+      theora: {keyframe_frequency: 64, optimize_for: 1, quality: 31, target_bitrate: 800000}
+camera1394stereo_node: {auto_brightness: 3, auto_exposure: 0, auto_focus: 5, auto_frame_rate_feature: 2,
+  auto_gain: 2, auto_gamma: 3, auto_hue: 3, auto_iris: 5, auto_pan: 3, auto_saturation: 3,
+  auto_sharpness: 3, auto_shutter: 2, auto_trigger: 0, auto_white_balance: 2, auto_zoom: 5,
+  bayer_method: Simple, bayer_pattern: '', binning_x: 0, binning_y: 0, brightness: 0.0,
+  camera_info_url_left: '', camera_info_url_right: '', exposure: 4000.0, external_trigger: false,
+  focus: 0.0, format7_color_coding: raw16, format7_packet_size: 0, frame_id: stereo_camera,
+  frame_rate: 15.0, frame_rate_feature: 480.0, gain: 1.0, gamma: 1024.0, guid: 00b09d0100ae9561,
+  hue: 2048.0, iris: 8.0, iso_speed: 400, pan: 0.0, reset_on_open: false, roi_height: 0,
+  roi_width: 0, saturation: 1024.0, sharpness: 1.0, shutter: 448.0, software_trigger: false,
+  stereo_method: Interlaced, trigger: 0.0, trigger_mode: mode_0, trigger_polarity: active_low,
+  trigger_source: source_0, video_mode: format7_mode3, white_balance_BU: 584.0, white_balance_RV: 587.0,
+  x_offset: 0, y_offset: 0, zoom: 0.0}
+dist_reader: {anchor_angle: 0.0, baud: 115200, beacon_distance: 0.0, id: a0, port: /dev/ttyACM0,
+  tag_angle: 0.0}
+folderpath: /home/aayushsingla/catkin_ws/storage/storage_2018-07-18_115519/subset/
+image_view_left: {colormap: -1, do_dynamic_scaling: false, max_image_value: 0.0, min_image_value: 0.0}
+image_view_right: {colormap: -1, do_dynamic_scaling: false, max_image_value: 0.0,
+  min_image_value: 0.0}
 rosdistro: 'indigo
 
   '
 roslaunch:
-  uris: {host_nav_w540__50291: 'http://NAV-W540:50291/'}
+  uris: {host_nav_w540__34247: 'http://NAV-W540:34247/', host_nav_w540__37747: 'http://NAV-W540:37747/'}
 rosversion: '1.11.21
 
   '
-run_id: 2811f1ec-85c8-11e8-829e-e8b1fc4ec2ad
-synchronizer: {folderpath: '', recording_image_frame: 2, recording_image_second: 0.001,
-  storage_mode: false, use_recording_image_second: true}
+run_id: 667cd894-8a81-11e8-b47f-e8b1fc4ec2ad
+synchronizer: {recording_image_frame: 2, recording_image_second: 0.001, storage_mode: false,
+  use_recording_image_second: true}

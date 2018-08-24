@@ -20,12 +20,12 @@
 #include <sensor_synchronizer/SyncDataMsg.h>
 #include <ros/package.h>
 #include <boost/filesystem.hpp>
+#include <dlr_ranging/ranging_msg.h>
 
 using namespace std;
 using namespace message_filters;
 static const std::string OPENCV_WINDOW1 = "Left Image window";
 string path = ros::package::getPath("sensor_synchronizer");
-//string src_path = path.substr(0,path.find_last_of("/\\"));
 string wk_path = path.substr(0,path.find("/src/"));
 string Image_path1;
 string Image_path2;
@@ -36,7 +36,6 @@ string groundtruth_file;
 string groundtrutheuler_file;
 string groundtruthcoordinates_file;
 
-
 ros::CallbackQueue my_callback_queue;
 ofstream rangelog;
 ofstream timestamplog;
@@ -45,6 +44,8 @@ ofstream groundtrutheulerlog;
 ofstream groundtruthcoordinateslog;
 std_msgs::Header last_img_header;
 
+
+//Set Defaults
 int Left_img_sec = 0;
 int Left_img_nsec = 0;
 int Right_img_sec = 0;
@@ -56,17 +57,17 @@ double Left_mean_timestamp = 0.0;
 double Right_mean_timestamp = 0.0;
 double test_time = 0.0;
 double rtk_timestamp = 0.0;
-
-bool storage_mode = true;     //turn on storage mode
+double dist_usrp_dlr_timestamp = 0.0;
+bool storage_mode = true;               //turn on storage mode
 bool use_time_difference = true;        //use time as storing parameter
-bool hit_flag = false;       //a match hit when dataset from three topics available
-int recording_image_frame = 2;  //recording rate for dataset
+bool hit_flag = false;                  //a match hit when dataset from three topics available
+int recording_image_frame = 2;          //recording rate for dataset
 double recording_image_second = 0.040; // in seconds
-int counter = 0;
-bool use_frequency;
 bool saved_last= false;
+bool use_decawave_ranging = true;
 sensor_msgs::Image msgLastLeft;
 sensor_msgs::Image msgLastRight;
+
 
 class MatchGrabber{
 public:
@@ -75,8 +76,9 @@ public:
   void Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight);
   void Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message);
   void GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message);
+  void Range_USRP_DLR_Callback(const dlr_ranging::ranging_msgPtr& message);
   cv::Mat M1l,M2l,M1r,M2r;
-  float stored_range = 0.0;
+  float range_measurement = 0.0;
   std::vector<double> rtk_matrix_rotm;
   float rtk_latitude;
   float rtk_longitude;
@@ -85,6 +87,7 @@ public:
   ros::Publisher rover_sync_record_pub;
   sensor_synchronizer::SyncDataMsg rover_sync_data;
   sensor_synchronizer::SyncDataMsg rover_sync_record;
+  float dist_usrp_dlr = 0.0;
 };
 
 void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sensor_msgs::ImageConstPtr &msgRight){
@@ -115,20 +118,28 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
   cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);
 
-  cv::imshow("Left Image", imLeft);
-  cv::imshow("Right Image",imRight);
-  cv::waitKey(2);
+//Display the images
+//   cv::imshow("Left Image", imLeft);
+//   cv::imshow("Right Image",imRight);
+//   cv::waitKey(2);
 
-  if (stored_range ==  0) {
+
+    //Override the UWB ranging with dlr ranging
+   if (!use_decawave_ranging){
+        range_measurement = dist_usrp_dlr;
+        range_last_timestamp=dist_usrp_dlr_timestamp;
+   }
+
+    //If no ranging measurement found
+  if (range_measurement ==  0) {
     cout << "Ranging measurement [m] = -1" << endl;
     }
   else {
-    cout << "Ranging measurement [m] = " << stored_range << endl;
+    cout << "Ranging measurement [m] = " << range_measurement << endl;
     }
-  counter++;
+
   static int image_counter1 = -1; //Left Image Counter
   static int image_counter2 = -1; //Right Image Counter
-
 
   Left_img_sec = msgLeft->header.stamp.sec;
   Left_img_nsec = msgLeft->header.stamp.nsec;
@@ -136,6 +147,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
   Right_img_nsec = msgRight->header.stamp.nsec;
   Left_mean_timestamp =  (Left_last_timestamp + Left_img_sec + Left_img_nsec/1e9)/2.0; //mean time stamp used by the range finder synchronization
 
+  // no sychronized topics
   if (!hit_flag){
         //Add the time, range, rtk matrices, images to sync data topic
         rover_sync_data.range_distance = -1;
@@ -145,7 +157,11 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
         rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
         rover_sync_data.rtk_latitude = rtk_latitude;
-        rover_sync_data.rtk_longitude =rtk_longitude;
+        rover_sync_data.rtk_longitude = rtk_longitude;
+        rover_sync_data.rtk_current_measurement = false;
+        if (abs(rover_sync_data.header.stamp.sec + rover_sync_data.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+            rover_sync_data.rtk_current_measurement = true;
+//	    rover_sync_data.dist_usrp_dlr = dist_usrp_dlr;
 
         //use time as storage parameter
          if (use_time_difference){
@@ -158,6 +174,9 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
                 rover_sync_record.rtk_latitude = rtk_latitude;
                 rover_sync_record.rtk_longitude = rtk_longitude;
+                rover_sync_record.rtk_current_measurement = false;
+                if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+                    rover_sync_record.rtk_current_measurement = true;
                 image_counter1++;
                 saved_last = true;
 
@@ -167,10 +186,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                     cv::imwrite(savingName1, imLeft);
                     for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                         groundtruthlog << *i << " ";
-                    groundtruthlog <<""<<endl;
+          //          groundtruthlog << rover_sync_record.rtk_current_measurement << endl;
+                    //groundtruthlog <<""<<endl;
                     for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                         groundtrutheulerlog << *i << " ";
-                    groundtrutheulerlog <<""<<endl;
+         //           groundtrutheulerlog << rover_sync_record.rtk_current_measurement << endl;
+                    //groundtrutheulerlog <<""<<endl;
                     groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
                     timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
                     rangelog << std::to_string(-1)<<endl;
@@ -198,6 +219,9 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                     rover_sync_record.rtk_latitude = rtk_latitude;
                     rover_sync_record.rtk_longitude = rtk_longitude;
                     saved_last = true;
+                    rover_sync_record.rtk_current_measurement = false;
+                    if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+                        rover_sync_record.rtk_current_measurement = true;
 
                     if(storage_mode){
                         std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
@@ -205,10 +229,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                         //Write timestamp and range file and ground_truth files
                         for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                             groundtruthlog << *i << " ";
-                        groundtruthlog <<""<<endl;
+         //               groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
+                        //groundtruthlog <<""<<endl;
                         for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                             groundtrutheulerlog << *i << " ";
-                        groundtrutheulerlog <<""<<endl;
+          //              groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
+                        //groundtrutheulerlog <<""<<endl;
                         groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
                         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
                         rangelog << std::to_string(-1)<<endl;
@@ -224,17 +250,18 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                }
           }
   }
-    else { //got the ranging measurement
+    else { //got the ranging measurement and hit_flag=true
         if (range_last_timestamp < Left_mean_timestamp){
             //Add the time, range, rtk matrices to the publishers
             rover_sync_data.header.stamp = msgLeft->header.stamp;
-            rover_sync_data.range_distance = stored_range;
+            rover_sync_data.range_distance = range_measurement;
             rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_data.rtk_latitude = rtk_latitude;
             rover_sync_data.rtk_longitude = rtk_longitude;
+	      //rover_sync_data.dist_usrp_dlr = dist_usrp_dlr;
 
-            rover_sync_record.range_distance = stored_range;
+            rover_sync_record.range_distance = range_measurement;
             rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_record.rtk_latitude = rtk_latitude;
@@ -243,6 +270,7 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             // Add the images to sync_data topic
             rover_sync_data.image_left = *msgLeft;
             rover_sync_data.image_right = *msgRight;
+
 
             image_counter1++;
             image_counter2++;
@@ -261,13 +289,15 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             if(storage_mode){
             //Write timestamp and range file and ground_truth files
                 timestamplog << last_img_header.stamp.sec << "." << last_img_header.stamp.nsec << endl;
-                rangelog << stored_range <<endl;
+                rangelog << range_measurement <<endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                     groundtruthlog << *i << " ";
-                groundtruthlog <<""<<endl;
+                //groundtruthlog <<""<<endl;
+            //    groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                     groundtrutheulerlog << *i << " ";
-                groundtrutheulerlog <<""<<endl;
+                //groundtrutheulerlog <<""<<endl;
+             //   groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
                 groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
 
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
@@ -280,13 +310,15 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         else { //take the new image as ranging time is closer to new image
             //Add the time, range, rtk matrices to the publishers
             rover_sync_data.header.stamp = msgLeft->header.stamp;
-            rover_sync_data.range_distance = stored_range;
+            rover_sync_data.range_distance = range_measurement;
             rover_sync_data.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_data.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_data.rtk_latitude = rtk_latitude;
             rover_sync_data.rtk_longitude =rtk_longitude;
+	        //rover_sync_data.dist_usrp_dlr = dist_usrp_dlr;
+	    
             rover_sync_record.header.stamp = msgLeft->header.stamp;
-            rover_sync_record.range_distance = stored_range;
+            rover_sync_record.range_distance = range_measurement;
             rover_sync_record.rtk_matrix_rotm = rtk_matrix_rotm;
             rover_sync_record.rtk_matrix_euler = rtk_matrix_euler;
             rover_sync_record.rtk_latitude = rtk_latitude;
@@ -303,13 +335,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             if (storage_mode){
                 //Write timestamp and range file and ground_truth files
                 timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
-                rangelog << stored_range <<endl;
+                rangelog << range_measurement <<endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                     groundtruthlog << *i << " ";
-                groundtruthlog <<""<<endl;
+              //  groundtruthlog <<""<<endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                     groundtrutheulerlog << *i << " ";
-                groundtrutheulerlog <<""<<endl;
+             //   groundtrutheulerlog <<""<<endl;
                 groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
                 cv::imwrite(savingName1, imLeft);
@@ -317,6 +349,16 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 cv::imwrite(savingName2, imRight);
             }
             saved_last = false;
+        }
+        rover_sync_data.rtk_current_measurement = false;
+        if (abs(rover_sync_data.header.stamp.sec + rover_sync_data.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+            rover_sync_data.rtk_current_measurement = true;
+        rover_sync_record.rtk_current_measurement = false;
+        if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+            rover_sync_record.rtk_current_measurement = true;
+        if (storage_mode){
+//            groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
+//            groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
         }
         hit_flag = false;
       }
@@ -331,8 +373,16 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
 
 void MatchGrabber::Range_Callback(const snowmower_msgs::DecaWaveMsgConstPtr& message){
   hit_flag = true;
-  stored_range = message->dist;
+  range_measurement = message->dist;
   range_last_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
+}
+
+void MatchGrabber::Range_USRP_DLR_Callback(const dlr_ranging::ranging_msgPtr& message){
+  hit_flag = true;
+  dist_usrp_dlr = message->ranging;
+  dist_usrp_dlr_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
+//  range_measurement = message->ranging;
+//  range_last_timestamp = message->header.stamp.sec + message->header.stamp.nsec/1e9;
 }
 
 void MatchGrabber::GroundTruth_Callback(const anavs_rtk_dlr::odometryConstPtr& message){
@@ -414,11 +464,12 @@ int main(int argc, char** argv)
   ros::param::get("~recording_image_second", recording_image_second);
   ros::param::get("~use_recording_image_second", use_time_difference);
   ros::param::get("~storage_mode", storage_mode);
+  ros::param::get("~use_decawave_ranging", use_decawave_ranging);
   ros::param::set("folderpath", folderpath+"/subset/");
 
 //Dump the parameters
-  std::string command = " echo 'ROS Params dumped' ; rosparam dump " + path +"/temporary.yaml";
-  system(command.c_str());
+//  std::string command = " echo 'ROS Params dumped' ; rosparam dump " + path +"/temporary.yaml";
+//  system(command.c_str());
 
 //Create folders and files
 if (storage_mode){
@@ -435,19 +486,26 @@ if (storage_mode){
   groundtruthcoordinateslog.open (groundtruthcoordinates_file,ios::out | ios::trunc);
   groundtruthcoordinateslog << "Latitude   Longitude" << endl;
 }
-  //Subscribe to camera
+  //Subscribe the stereo images and sync
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol1;
   message_filters::Synchronizer<sync_pol1> sync1(sync_pol1(1), left_sub, right_sub);
   sync1.registerCallback(boost::bind(&MatchGrabber::Callback, &igb, _1, _2));
 
-  //Subscribe to Ranging sensor and RTK
+  //Subscribe the uwb ranging or the DLR's usrp-based ranging
+  ros::Subscriber range_usrp_dlr_sub = nh.subscribe("/dlr_kn/dist_estimates_cut", 1, &MatchGrabber::Range_USRP_DLR_Callback,&igb);
   ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
+/*  if (use_decawave_ranging){ //Subscribe the uwb ranging
+    ros::Subscriber range_sub = nh.subscribe("/ranger_finder/data", 1,&MatchGrabber::Range_Callback,&igb);
+  }else{ //Subscribe the DLR's usrp-based ranging
+    ros::Subscriber range_usrp_dlr_sub = nh.subscribe("/dlr_kn/dist_estimates_cut", 1, &MatchGrabber::Range_USRP_DLR_Callback,&igb);
+  }*/
+  
+  //Subscribe the rtk
   ros::Subscriber groundtruth_sub = nh.subscribe("/rtk_odometry", 1,&MatchGrabber::GroundTruth_Callback,&igb);
-
-  //Publish & Subscribe the rover status
-
+  
+  //Publish the synchronized dataset
   igb.rover_sync_data_pub =  nh.advertise<sensor_synchronizer::SyncDataMsg>("/tum_nav/sync_data", 1);
   igb.rover_sync_record_pub =  nh.advertise<sensor_synchronizer::SyncDataMsg>("/tum_nav/sync_record", 1);
 
