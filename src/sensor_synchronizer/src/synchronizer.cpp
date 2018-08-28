@@ -186,13 +186,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                     cv::imwrite(savingName1, imLeft);
                     for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                         groundtruthlog << *i << " ";
-          //          groundtruthlog << rover_sync_record.rtk_current_measurement << endl;
+                    groundtruthlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                     //groundtruthlog <<""<<endl;
                     for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                         groundtrutheulerlog << *i << " ";
-         //           groundtrutheulerlog << rover_sync_record.rtk_current_measurement << endl;
+                    groundtrutheulerlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                     //groundtrutheulerlog <<""<<endl;
-                    groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                    groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << "\t" << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                     timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
                     rangelog << std::to_string(-1)<<endl;
                 }
@@ -229,13 +229,13 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                         //Write timestamp and range file and ground_truth files
                         for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                             groundtruthlog << *i << " ";
-         //               groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
+                        groundtruthlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                         //groundtruthlog <<""<<endl;
                         for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                             groundtrutheulerlog << *i << " ";
-          //              groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
+                        groundtrutheulerlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                         //groundtrutheulerlog <<""<<endl;
-                        groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                        groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << "\t" << std::to_string(rover_sync_record.rtk_current_measurement) <<endl;
                         timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
                         rangelog << std::to_string(-1)<<endl;
                     }
@@ -285,6 +285,9 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 rover_sync_record.image_left = msgLastLeft;
                 rover_sync_record.image_left = msgLastRight;
                 }
+            rover_sync_record.rtk_current_measurement = false;
+            if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+               rover_sync_record.rtk_current_measurement = true;
 
             if(storage_mode){
             //Write timestamp and range file and ground_truth files
@@ -293,12 +296,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                     groundtruthlog << *i << " ";
                 //groundtruthlog <<""<<endl;
-            //    groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
+                groundtruthlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                     groundtrutheulerlog << *i << " ";
                 //groundtrutheulerlog <<""<<endl;
-             //   groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
-                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                groundtrutheulerlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
+                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude <<"\t" << std::to_string(rover_sync_record.rtk_current_measurement)<< endl;
 
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
                 cv::imwrite(savingName1, imLeft);
@@ -332,6 +335,10 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
             image_counter1++;
             image_counter2++;
 
+            rover_sync_record.rtk_current_measurement = false;
+            if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
+                rover_sync_record.rtk_current_measurement = true;
+
             if (storage_mode){
                 //Write timestamp and range file and ground_truth files
                 timestamplog << msgLeft->header.stamp.sec << "." << msgLeft->header.stamp.nsec << endl;
@@ -339,10 +346,12 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
                 for (std::vector<double>::const_iterator i = rtk_matrix_rotm.begin(); i != rtk_matrix_rotm.end(); ++i)
                     groundtruthlog << *i << " ";
               //  groundtruthlog <<""<<endl;
+                groundtruthlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                 for (std::vector<double>::const_iterator i = rtk_matrix_euler.begin(); i != rtk_matrix_euler.end(); ++i)
                     groundtrutheulerlog << *i << " ";
              //   groundtrutheulerlog <<""<<endl;
-                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << endl;
+                groundtrutheulerlog << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
+                groundtruthcoordinateslog << rtk_latitude << "\t" << rtk_longitude << "\t" << std::to_string(rover_sync_record.rtk_current_measurement) << endl;
                 std::string savingName1 = Image_path1 + "Left_image" + std::to_string(image_counter1) + ".png";
                 cv::imwrite(savingName1, imLeft);
                 std::string savingName2 = Image_path2 + "Right_image" + std::to_string(image_counter2) + ".png";
@@ -353,13 +362,6 @@ void MatchGrabber::Callback(const sensor_msgs::ImageConstPtr &msgLeft, const sen
         rover_sync_data.rtk_current_measurement = false;
         if (abs(rover_sync_data.header.stamp.sec + rover_sync_data.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
             rover_sync_data.rtk_current_measurement = true;
-        rover_sync_record.rtk_current_measurement = false;
-        if (abs(rover_sync_record.header.stamp.sec + rover_sync_record.header.stamp.nsec/1e9 - rtk_timestamp) < 0.02 )
-            rover_sync_record.rtk_current_measurement = true;
-        if (storage_mode){
-//            groundtruthlog << rover_sync_data.rtk_current_measurement << endl;
-//            groundtrutheulerlog << rover_sync_data.rtk_current_measurement << endl;
-        }
         hit_flag = false;
       }
     last_img_header = msgLeft->header;
@@ -486,6 +488,9 @@ if (storage_mode){
   groundtruthcoordinateslog.open (groundtruthcoordinates_file,ios::out | ios::trunc);
   groundtruthcoordinateslog << "Latitude   Longitude" << endl;
 }
+bool abc= true;
+  groundtruthcoordinateslog << std::boolalpha << abc  << endl;
+  //std::cout << std::noboolalpha << t << " == " << std::boolalpha << t << std::endl;
   //Subscribe the stereo images and sync
   message_filters::Subscriber<sensor_msgs::Image> left_sub(nh, "/camera/left/image_raw", 1);
   message_filters::Subscriber<sensor_msgs::Image> right_sub(nh, "/camera/right/image_raw", 1);

@@ -219,7 +219,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     cout << "average reprojection err = " <<  err/npoints << endl;
 
     // save intrinsic parameters
-    FileStorage fs("85_intrinsics.yml", CV_STORAGE_WRITE);
+    FileStorage fs("intrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "K1" << cameraMatrix[0] << "D1" << distCoeffs[0] <<
@@ -237,7 +237,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                   imageSize, R, T, R1, R2, P1, P2, Q,
                   CALIB_ZERO_DISPARITY, 1, imageSize, &validRoi[0], &validRoi[1]);
 
-    fs.open("85_extrinsics.yml", CV_STORAGE_WRITE);
+    fs.open("extrinsics.yml", CV_STORAGE_WRITE);
     if( fs.isOpened() )
     {
         fs << "R" << R << "T" << T << "R1" << R1 << "R2" << R2 << "P1" << P1 << "P2" << P2 << "Q" << Q;
