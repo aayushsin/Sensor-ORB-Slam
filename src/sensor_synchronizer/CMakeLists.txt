@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(sensor_synchronizer)
 SET(CMAKE_CXX_FLAGS "-std=c++11")
-set(OpenCV_DIR /usr/share/OpenCV/)
+set(OpenCV_DIR /usr/local/share/OpenCV/)
 find_package(catkin REQUIRED COMPONENTS 
 	camera_info_manager 
 	image_transport 
@@ -53,14 +53,10 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 add_executable(synchronizer_node1 src/synchronizer.cpp)
-add_executable(synchronizer_node2 src/synchronizer1.cpp)
-add_executable(synchronizer_node3 src/synchronizer_two_cameras.cpp)
+add_executable(synchronizer_node2 src/synchronizer_two_cameras.cpp)
 add_dependencies(synchronizer_node1 sensor_synchronizer_generate_messages_cpp)
 add_dependencies(synchronizer_node2 sensor_synchronizer_generate_messages_cpp)
-add_dependencies(synchronizer_node3 sensor_synchronizer_generate_messages_cpp)
 target_link_libraries(synchronizer_node1 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node2 ${catkin_LIBRARIES})
-target_link_libraries(synchronizer_node3 ${catkin_LIBRARIES})
 target_link_libraries(synchronizer_node1 ${OpenCV_LIBS})
 target_link_libraries(synchronizer_node2 ${OpenCV_LIBS})
-target_link_libraries(synchronizer_node3 ${OpenCV_LIBS})

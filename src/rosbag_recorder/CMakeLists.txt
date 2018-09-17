@@ -7,7 +7,7 @@ project(rosbag_recoder)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-set(OpenCV_DIR /usr/share/OpenCV/)
+set(OpenCV_DIR /usr/local/share/OpenCV/)
 find_package(catkin REQUIRED COMPONENTS
   OpenCV
   cv_bridge
