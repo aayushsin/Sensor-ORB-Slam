@@ -40,7 +40,7 @@ class ImageCreator():
         self.bridge = CvBridge()
 
         # open the timetamp file
-        #fh = open(str(save_dir) + "/timestamp.txt", "w")
+        fh = open(str(save_dir) + "file_name.txt", "w")
 
         # Open bag file.
         with rosbag.Bag(filename, 'r') as bag:
@@ -51,35 +51,41 @@ class ImageCreator():
 
 
 
-                if topic == "/camera/left/image_raw/":
+                if topic == "/stereo_camera/left/image_raw":
+                    print 'left'
+                    print msg.header.stamp.to_sec()
                     try:
                         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
                     except CvBridgeError, e:
                         print e
                     timestr = "%.9f" % msg.header.stamp.to_sec()
-                    # image_name = str(save_dir)+"/left/"+timestr+".jpg" || Other format .pgm
-                    if (msg.header.stamp.to_nsec() - self.lastCaptureTime_left > 49000000):
-                        image_name = str(save_dir) + "/left/Left_image" + str(self.image_counter1) + ".jpg"
-                        cv.imwrite(image_name, cv_image)
-                        self.image_counter1 += 1
-                        #fh.write(timestr + '\n')
-                        self.lastCaptureTime_left = msg.header.stamp.to_nsec()
+                    image_name = str(save_dir)+'left'+str(self.image_counter1)+".jpg"
+                    #if (msg.header.stamp.to_nsec() - self.lastCaptureTime_left > 49000000):
+                    #    image_name = str(save_dir) + "/left/Left_image" + str(self.image_counter1) + ".jpg"
+                    cv.imwrite(image_name, cv_image)
+                    self.image_counter1 += 1
+                    fh.write('"'+image_name +'"\n')
+                       #self.lastCaptureTime_left = msg.header.stamp.to_nsec()
 
-                if topic == "/camera/right/image_raw":
+                if topic == "/stereo_camera/right/image_raw":
+                    print 'right'
+                    print msg.header.stamp.to_sec()
                     try:
                         cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
                     except CvBridgeError, e:
                         print e
 
                     # 0.040 ns gap between left and right image
-                    # timestr = "%.6f" % msg.header.stamp.to_sec()
-                    # image_name = str(save_dir)+"/right/"+timestr+".jpg" || Other format .pgm
-                    if (msg.header.stamp.to_nsec() - self.lastCaptureTime_right > 49000000):
-                        image_name = str(save_dir) + "/right/Right_image" + str(self.image_counter2) + ".jpg"
-                        cv.imwrite(image_name, cv_image)
-                        self.image_counter2 += 1
-                        self.lastCaptureTime_right = msg.header.stamp.to_nsec()
-            #fh.close()
+                    # # timestr = "%.6f" % msg.header.stamp.to_sec()
+                    image_name = str(save_dir) + 'right' + str(self.image_counter2) + ".jpg"
+                    #image_name = str(save_dir)+"/right/"+timestr+".jpg" || Other format .pgm
+                    # #if (msg.header.stamp.to_nsec() - self.lastCaptureTime_right > 49000000):
+                    #     image_name = str(save_dir) + "/right/Right_image" + str(self.image_counter2) + ".jpg"
+                    cv.imwrite(image_name, cv_image)
+                    self.image_counter2 += 1
+                    fh.write('"' + image_name + '"\n')
+                    #     self.lastCaptureTime_right = msg.header.stamp.to_nsec()
+        fh.close()
 
 
 # Main function.
