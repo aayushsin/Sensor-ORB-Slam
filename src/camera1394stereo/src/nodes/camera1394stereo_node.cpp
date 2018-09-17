@@ -62,21 +62,14 @@ int main(int argc, char **argv)
   ros::NodeHandle node;
   ros::NodeHandle priv_nh("~");
   ros::NodeHandle camera_nh("stereo_camera");
-  //ros::Rate loop_rate(20);
   signal(SIGSEGV, &sigsegv_handler);
   camera1394stereo_driver::Camera1394StereoDriver dvr(priv_nh, camera_nh);
 
   dvr.setup();
   while (node.ok())
     {
-
       dvr.poll();
-      //double Timestamp1 = ros::Time::now().toSec();
-      //float Timestamp2 = ros::Time::now().toSec();
-
-      //ROS_INFO("image time %f\n", Timestamp1);
       ros::spinOnce();
-      //loop_rate.sleep();
     }
   dvr.shutdown();
 

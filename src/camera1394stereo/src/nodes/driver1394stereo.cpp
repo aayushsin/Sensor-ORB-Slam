@@ -36,13 +36,11 @@
 
 #include <boost/format.hpp>
 
-#include <driver_base/SensorLevels.h>
 #include <tf/transform_listener.h>
-#include <time.h>
+
 #include "driver1394stereo.h"
 #include "camera1394stereo/Camera1394StereoConfig.h"
 #include "featuresstereo.h"
-#include <ros/ros.h>
 
 /** @file
 
@@ -73,8 +71,7 @@ namespace camera1394stereo_driver
 {
   // some convenience typedefs
   typedef camera1394stereo::Camera1394StereoConfig Config;
-  typedef driver_base::Driver Driver;
-  typedef driver_base::SensorLevels Levels;
+  typedef Camera1394StereoDriver Driver;
 
   const std::string Camera1394StereoDriver::CameraSelectorString[NUM_CAMERAS] = {"left","right"};
 
@@ -226,13 +223,11 @@ namespace camera1394stereo_driver
    *  @param image points to latest camera frame
    */
   void Camera1394StereoDriver::publish(const sensor_msgs::ImagePtr image[NUM_CAMERAS])
-  { static int counter = 0;
-    counter ++;
+  {
     for (int i=0; i<NUM_CAMERAS; i++)
       {
         image[i]->header.frame_id = config_.frame_id;
-        image[i]->header.stamp = ros::Time::now();          //adding the new line here!
-        ROS_INFO("image %d counter %d %f\n",i, counter, image[i]->header.stamp.toSec());
+
         // get current CameraInfo data
         sensor_msgs::CameraInfoPtr
           ci(new sensor_msgs::CameraInfo(cinfo_[i]->getCameraInfo()));
