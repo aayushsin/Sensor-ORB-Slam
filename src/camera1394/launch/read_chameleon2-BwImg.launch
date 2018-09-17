@@ -1,0 +1,83 @@
+<launch>
+
+    <!-- first camera -->
+    <node pkg="camera1394" type="camera1394_node" name="camera_1394_primary">
+        <param name="guid" value="00b09d0100ba9ecb"/>
+        <param name="video_mode" value="640x480_mono8"/>
+        <param name="iso_speed" value="400"/>
+        <param name="frame_rate" value="30"/>
+        <param name="bayer_pattern" value="rggb"/>
+        <param name="bayer_method" value=""/>
+        
+        <param name="auto_shutter" value="2"/>
+        <param name="shutter" value="583"/>
+        
+        <param name="auto_gamma" value="3"/>
+        <param name="gamma" value="1024"/>
+        
+        <param name="auto_exposure" value="3"/>
+        <param name="exposure" value="780.0"/>
+        
+        <param name="auto_gain" value="4"/>
+        <param name="gain" value="160"/>
+        
+        <param name="camera_info_url" value="package://camera1394/chameleon_cfg.yaml"/>
+        <remap from="/camera/image_raw" to="/camera/left/image_raw"/>
+    </node>
+    <!--<node ns="left" pkg="image_proc" type="image_proc" name="image_proc" />-->
+
+    <node pkg="image_view" type="image_view" name="image_chameleon_primary">
+        <remap from="image" to="/camera/left/image_raw"/>
+    </node>
+
+
+    <!-- second camera -->
+
+    <node pkg="camera1394" type="camera1394_node" name="camera_1394_secondary">
+        <param name="guid" value="00b09d0100ba9eca"/>
+        <param name="video_mode" value="640x480_mono8"/>
+        <param name="iso_speed" value="400"/>
+        <param name="frame_rate" value="30"/>
+        <param name="bayer_pattern" value="rggb"/>
+        <param name="bayer_method" value=""/>
+        
+        <param name="auto_shutter" value="2"/>
+        <param name="shutter" value="583"/>
+        
+        <param name="auto_gamma" value="3"/>
+        <param name="gamma" value="1024"/>
+        
+        <param name="auto_exposure" value="3"/>
+        <param name="exposure" value="780.0"/>
+        
+        <param name="auto_gain" value="4"/>
+        <param name="gain" value="160"/>
+        
+        <param name="camera_info_url" value="package://camera1394/chameleon_cfg.yaml"/>
+        <remap from="/camera/image_raw" to="/camera/right/image_raw"/>
+    </node>
+    <!--<node ns="left" pkg="image_proc" type="image_proc" name="image_proc" />-->
+
+    <node pkg="image_view" type="image_view" name="image_chameleon_secondary">
+        <remap from="image" to="/camera/right/image_raw"/>
+    </node>
+
+    <!--    <node ns="camera" pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc" output="screen">
+            <remap from="stereo" to="camera"/>
+            <remap from="image" to="image_raw"/>
+        </node>-->
+
+
+<!--    <node pkg="image_view" type="stereo_view" name="stereo_view" output="screen">
+        <remap from="stereo" to="camera"/>
+        <remap from="image" to="image_raw"/>
+        <param name="_approximate_sync" value="true"/>
+        <param name="queue_size" value="10"/>
+    </node>-->
+
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="reconfigure_gui" output="screen"/>
+
+    
+
+
+</launch>

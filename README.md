@@ -20,15 +20,13 @@ Compile
 Set-Up
 ========
 7. source devel/setup.bash
-8. sudo chmod 666 /dev/ttyACM*: the enumeration should be the same as it is displayed.
-check accordingly the port number in the launch file <param name="port" value="/dev/ttyACM0" type="string"/> in catkin_ws/src/read_dw_camera_dist.launch 
-or
-self.dwPort = rospy.get_param('~port','dev/ttyACM0') in catkin_ws/src/decawave_driver/src/dist_read.py
+8. sudo chmod 666 /dev/ttyACM*: the enumeration should be the same as it is displayed. Normally, it should be "/dev/ttyACM0"
+	If not, modify: catkin_ws/src/read_dw_camera_dist.launch and catkin_ws/src/decawave_driver/src/dist_read.py with right enumeration
 9. Run the ANavsWizard for UBX solution after connecting to wifi SSID: ANavs_RTK_Server and wait for 2-3 mins to get the correct precision data
 10. Change the IP of your ANavs_PI in src/anavs_rtk_dlr/src/anavs_rtk_node.py in variable self.tcp_ip
-11. The bayer pattern in <CATKIN_WS>/read_dw_camera_dist.launch refers to the type of image displayed and recoreded. "grbg" refers to colorful while "" to monochrome image.
-12. Terminal1: roslaunch read_dw_camera_dist.launch
-13. roslaunch filter_sychronizer1 synchronizer.launch
+11. The bayer pattern in <CATKIN_WS>/read_*_dist.launch refers to the type of image displayed and recoreded. "grbg" refers to colorful while "" to monochrome image.
+12. Terminal1: roslaunch read_colorImg_dw_camera_dist.launch for rbg image or read_bwImg_dw_camera_dist.launch for monochrome image
+13. roslaunch sensor_synchronizer synchronizer.launch
 
 ========
 Denotation
@@ -37,14 +35,15 @@ Denotation
 2. On Terminal2, "Ranging measurement [m]"should be printed out.
 3. /rtk_odometry rostopic for rtk position and rotation matrix alongwith rostime
 4. /tum_nav/sync_data for synchronized topic with images, rtk and ranging measurements
+5. /tum_nav/sync_record for synchronized topic with images, rtk and ranging measurements which is used in storing wherein storing paramters are used
 
 ========
 Storage
 ========
 ######Note the storing rate could be set:
-cd /*/catkin_ws/src/filter_synchronizer1/launch/, in synchronizer.launch
-"recording_counter" default as 2, which means the storage is implemented once every two images between two rannging measurements. Change it accordingly to  your application.
-"recording_frequency" default to 0.040 refers to the minimum time difference between two subsequent saved images.
+cd /*/catkin_ws/src/sensor_synchronizer/launch/, in synchronizer.launch
+"recording_image_frame" default as 2, which means the storage is implemented once every two images between two rannging measurements. Change it accordingly to  your application.
+"recording_image_second" default to 0.040 refers to the minimum time difference between two subsequent saved images.
 
 1. cd /*/catkin_ws/src/storage/strorage***/left_image_data/, the left images are stored here
 2. cd /*/catkin_ws/src/storage/strorage***/right_image_data/, the right images are stored here
@@ -56,10 +55,10 @@ cd /*/catkin_ws/src/filter_synchronizer1/launch/, in synchronizer.launch
 ========
 Bag Files
 ========
-1) Change the path in argument of  <CATKIN_WS>/src/bag_images/launch/record.launch file.
-2) Change the path in argument of  <CATKIN_WS>/src/bag_images/launch/record_sync.launch file.
-3) roslaunch bag_images record.launch will record 4 topics : Camera_left, Camera_right, ranger_distance, rtk_odometry
-4) roslaunch bag_images record_sync.launch will record just 1 topics : /tum_nav/sync_data for synchronized data
+1) Change the path in argument of  <CATKIN_WS>/src/rosbag_recoder/launch/record.launch file.
+2) Change the path in argument of  <CATKIN_WS>/src/rosbag_recoder/launch/record_sync.launch file.
+3) roslaunch rosbag_recoder record.launch will record 4 topics : Camera_left, Camera_right, ranger_distance, rtk_odometry
+4) roslaunch rosbag_recoder record_sync.launch will record just 1 topics : /tum_nav/sync_data for synchronized data
 
 
 

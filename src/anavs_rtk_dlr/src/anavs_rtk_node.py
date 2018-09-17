@@ -34,10 +34,12 @@ class AnavsRTKNode:
         self.nav_msg = NavSatFix()
         self.gnss_time_msg = TimeReference()
         self.odom_local = Odometry()
-        # self.tcp_ip = rospy.get_param('rtk_module_ip', "192.168.42.1") # tum-nav
-        self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.13")  # dlr-kn (pw: #LocoExplo#)
-        # self.tcp_ip = rospy.get_param('rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
-
+        self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip')
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
+        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.53?") # tum-nav (pw:?)
+        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
+        # self.tcp_ip = rospy.get_param('/anavs_rtk_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
+        
         # ------------------------------------------------------------------------------
         # create publisher, subscriber and node handle
         self.pub_odometry = rospy.Publisher('rtk_odometry', odom, queue_size=10)
@@ -50,7 +52,7 @@ class AnavsRTKNode:
         self.tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.tcp_socket.connect((self.tcp_ip, TCP_PORT))
         self.tcp_socket.setblocking(0)
-        print "Connected to RTK processing module"
+        print "Connected to RTK processing module %s:%d" % (self.tcp_ip, TCP_PORT)
 
         # ------------------------------------------------------------------------------
         # main loop
@@ -98,8 +100,8 @@ class AnavsRTKNode:
         euler_angles = np.array(
             [[self.parser.bank * np.pi / 180, self.parser.elevation * np.pi / 180, self.parser.heading * np.pi / 180]])
 
-        rotation_matrix = self.build_r1(self.parser.bank * np.pi / 180) * self.build_r2(
-            self.parser.elevation * np.pi / 180) * self.build_r3(self.parser.heading * np.pi / 180)
+	# Rotation sequence from B to MSM: 321 => rotation_matrix: rotm_msm2base
+	rotation_matrix = self.build_r3(self.parser.heading * np.pi / 180) * self.build_r2(self.parser.elevation * np.pi / 180) * self.build_r1(self.parser.bank * np.pi / 180) 
         rotation_matrix = np.asarray(rotation_matrix)
 
         self.rtk_groundtruth.header.stamp = current_time
