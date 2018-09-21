@@ -48,8 +48,9 @@
     
 
     <node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen">
-        <param name="rtk_module_ip" value="localhost"/>
-        <!--<param name="rtk_module_ip" value="192.168.42.1"/>-->
+        <!--<param name="rtk_module_ip" value="localhost"/>-->
+        <param name="rtk_module_ip" value="192.168.42.1"/>
+        <!--<param name="rtk_module_ip" value="192.168.42.13"/>-->
     </node>
  
     <node pkg="anavs_rtk_dlr" type="anavs_rtk_static_node.py" name="anavs_rtk_static_node" output="screen">
@@ -60,6 +61,8 @@
     
 
     <node pkg="dlr_ranging" type="dlr_ranging_node.py" name="dlr_ranging_node" output="screen">
+	<param name="ranging_module_ip" value="localhost"/>
+        <!--<param name="ranging_module_ip" value="192.168.20.12"/>-->
         <param name="dRoverID" value="11"/>
         <param name="sRoverID" value="14"/>
     </node>

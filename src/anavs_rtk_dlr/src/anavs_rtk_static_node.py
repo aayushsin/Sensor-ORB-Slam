@@ -36,8 +36,8 @@ class AnavsRTKNode:
         self.odom_local = Odometry()
         self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip')
         #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "localhost") # dummy_receiver (PAD_solution)
-        # self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.53") # tum-nav
-        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.42.1")  # dlr-kn: Columbus (pw: #LocoExplo#)
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.42.1")  # tum-nav
+        #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.13") # dlr-kn: Columbus (pw: #LocoExplo#)
         #self.tcp_ip = rospy.get_param('/anavs_rtk_static_node/rtk_module_ip', "192.168.20.63")  # dlr-kn: Vespucci (pw: #LocoExplo#)
         
         # ------------------------------------------------------------------------------
