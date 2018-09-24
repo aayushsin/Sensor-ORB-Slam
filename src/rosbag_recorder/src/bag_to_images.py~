@@ -9,8 +9,11 @@ import rospy
 import cv2 as cv
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+
+# Reading bag filename from command line or roslaunch parameter.
 import os
 import sys
+import numpy as np
 
 
 class ImageCreator():
@@ -36,19 +39,13 @@ class ImageCreator():
         # Use a CvBridge to convert ROS images to OpenCV images so they can be saved.
         self.bridge = CvBridge()
 
-        # open the name file
-        fh = open(str(save_dir) + "stereo_calib.xml", "w")
-
-        # Write start tags
-        fh.write('<?xml version="1.0"?>\n')
-        fh.write('<opencv_storage>\n')
-        fh.write('<imagelist>\n')
+        # open the timetamp file
+        fh = open(str(save_dir) + "file_name.txt", "w")
 
         # Open bag file.
         with rosbag.Bag(filename, 'r') as bag:
             for topic, msg, t in bag.read_messages():
 
-                #For future use
                 if topic == "/ranger_finder/data":
                     range=msg.dist
 
@@ -63,6 +60,8 @@ class ImageCreator():
                         print e
                     timestr = "%.9f" % msg.header.stamp.to_sec()
                     image_name = str(save_dir)+'left'+str(self.image_counter1)+".jpg"
+                    #if (msg.header.stamp.to_nsec() - self.lastCaptureTime_left > 49000000):
+                    #    image_name = str(save_dir) + "/left/Left_image" + str(self.image_counter1) + ".jpg"
                     cv.imwrite(image_name, cv_image)
                     self.image_counter1 += 1
                     fh.write('"'+image_name +'"\n')
@@ -76,15 +75,16 @@ class ImageCreator():
                     except CvBridgeError, e:
                         print e
 
+                    # 0.040 ns gap between left and right image
+                    # # timestr = "%.6f" % msg.header.stamp.to_sec()
                     image_name = str(save_dir) + 'right' + str(self.image_counter2) + ".jpg"
+                    #image_name = str(save_dir)+"/right/"+timestr+".jpg" || Other format .pgm
+                    # #if (msg.header.stamp.to_nsec() - self.lastCaptureTime_right > 49000000):
+                    #     image_name = str(save_dir) + "/right/Right_image" + str(self.image_counter2) + ".jpg"
                     cv.imwrite(image_name, cv_image)
                     self.image_counter2 += 1
                     fh.write('"' + image_name + '"\n')
                     #     self.lastCaptureTime_right = msg.header.stamp.to_nsec()
-
-        #Write end tags
-        fh.write('</imagelist>\n')
-        fh.write('</opencv_storage>\n')
         fh.close()
 
 
