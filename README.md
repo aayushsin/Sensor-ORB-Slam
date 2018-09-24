@@ -19,50 +19,50 @@ Compile
 2. delete build, devel
 3. chmod +x <repo_name>/src/decawave_driver/src/dist_read.py
 4. catkin_make
-* Hint: If you have errors with your opencv version and installation path, fix the path in CmakeLists.txt of appropriate package as OPENCV_DIR
+Hint: If you have errors with your opencv version and installation path, fix the path in CmakeLists.txt of appropriate package as OPENCV_DIR
 
 =============
 ROS packages
 =============
-1.  anavs_rtk_dlr 
+1.  anavs_rtk_dlr: 
 This package reads the anavs_rtk UBX solution and parses it: 
 anavs_parser.py: used to decode the UBX solution into corresponding fields
 anavs_rtk_node.py: listens to the UBX solution, calls the parser to parse the solution, and publishes a ros topic with the solution artifacts
 odometry message: has fields like timestamps, latitude longitude, rtk euler matrix and rotation matrix
 
-2. camera1394
+2. camera1394: 
 ROS driver for cameras that use the IEEE 1394 Digital Camera (IIDC) protocol, such as Chameleon. Only supports the ros indigo version  
 http://wiki.ros.org/camera1394/
 
-3. camera1394stereo 
+3. camera1394stereo: 
 Stereo version of camera1394. Used as a driver for Bumblebee2. Supports both indigo and kinetic; the kinetic version has a problem with adjusting camera paramsters.
 http://wiki.ros.org/camera1394stereo
 https://github.com/srv/camera1394stereo
 More information about parameters in http://wiki.ros.org/camera1394
 
-4.  decawave_driver 
+4.  decawave_driver: 
 This driver reads distance values from the DecaWave TREK1000 modules and publishes a snowmower_msgs/DecaWaveMsgs.msg on the topic decawave/dist.
 ranging_test.py: to test the sensors
 dist_reader.py: reads the distance via an USB serial port and publish the rostopic /ranger_finder/data
 
-5.  dlr_ranging
+5.  dlr_ranging: 
 This driver receives the ranging measurements between two rovers in a swarm system, provided by the DLR’s USRP radio navigation system. The number and IP of the rovers should be set in the launch file. 
 
-6. geometry
+6. geometry: 
 Optional – to use euler and quarterian conversions
 
-7.  rosbag_recorder
-bag_to_images.py (in development): converts rosbag to images based on topic name. 
+7.  rosbag_recorder: 
+bag_to_images.py (in development) converts rosbag to images based on topic name. 
 
-8. sensor_synchronizer
+8. sensor_synchronizer: 
 The driver synchronizes stereo images, ranging measurements, and RTK odometry using ROS timestamp, and published two following topics: 
 /tum_nav/sync_data: all synchronized data (stereo images-rangign-RTK odometry)
 /tum_nav/sync_record: truncated synchronized data (for the purpose of smaller data storage)
 
-9.  snowmover_msgs
+9.  snowmover_msgs:
 ROS message package needed for decawave driver
 
-10. ueye_cam 
+10. ueye_cam: 
 A ROS nodelet and node that wraps the driver API for UEye cameras by IDS Imaging Development Systems GMBH.
 
 ========
