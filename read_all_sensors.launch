@@ -16,18 +16,15 @@
 
     
     <node pkg="camera1394stereo" type="camera1394stereo_node" name="camera1394stereo_node" output="screen">
+        <param name="frame_rate" value="30.0"/>
         <param name="video_mode" value="format7_mode3"/>
         <param name="format7_color_coding" value="raw16"/>
         <param name="bayer_pattern" value=""/>
         <param name="bayer_method" value="Simple"/>
         <param name="stereo_method" value="Interlaced"/>
-<!--        <param name="camera_info_url_left" value="package://camera1394stereo/bumblebee2.yaml"/>
-        <param name="camera_info_url_right" value="package://camera1394stereo/bumblebee2.yaml"/>-->
         <param name="auto_exposure" value="3"/>
-        <param name="exposure" value="4000"/>
+        <param name="exposure" value="450"/>
         <param name="auto_gain" value="3"/>
-        <param name="gain" value="1"/>
-        <param name="auto_sharpness" value="3"/>
         <param name="gain" value="1"/>
 
         <remap from="/stereo_camera/left/image_raw" to="/camera/left/image_raw"/>
@@ -35,8 +32,6 @@
     </node>
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="reconfigure_gui" output="screen"/>
 
-    
-    
     <node pkg="image_view" type="image_view" name="image_view_left">
         <remap from="image" to="/camera/left/image_raw"/>
     </node>
@@ -49,32 +44,22 @@
 
     <node pkg="anavs_rtk_dlr" type="anavs_rtk_node.py" name="anavs_rtk_node" output="screen">
         <!--<param name="rtk_module_ip" value="localhost"/>-->
-        <param name="rtk_module_ip" value="192.168.42.1"/>
-        <!--<param name="rtk_module_ip" value="192.168.42.13"/>-->
+        <param name="rtk_module_ip" value="192.168.20.13"/>
     </node>
  
+ 
+ 
     <node pkg="anavs_rtk_dlr" type="anavs_rtk_static_node.py" name="anavs_rtk_static_node" output="screen">
-        <param name="rtk_module_ip" value="localhost"/>
-        <!--<param name="rtk_module_ip" value="192.168.20.63"/>-->
+        <!--<param name="rtk_module_ip" value="localhost"/>-->
+        <param name="rtk_module_ip" value="192.168.20.43"/>
     </node>
-    
-    
 
+  
+  
     <node pkg="dlr_ranging" type="dlr_ranging_node.py" name="dlr_ranging_node" output="screen">
-	<param name="ranging_module_ip" value="localhost"/>
-        <!--<param name="ranging_module_ip" value="192.168.20.12"/>-->
+	<!--<param name="ranging_module_ip" value="localhost"/>-->
+        <param name="ranging_module_ip" value="192.168.20.12"/>
         <param name="dRoverID" value="11"/>
         <param name="sRoverID" value="14"/>
     </node>
-    
-    
-    
-    <!--<node name="$(anon dynparam)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters /camera/left/image_raw/compressed">-->
-    <!--<param name="format" value="png" />-->
-    <!--</node>-->
-
-    <!--<node name="change_compressed_right" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters /camera/right/image_raw/compressed">-->
-    <!--<param name="format" value="png" />-->
-    <!--</node>-->
-
 </launch>
